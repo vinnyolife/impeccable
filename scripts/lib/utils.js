@@ -293,6 +293,11 @@ export const PROVIDER_PLACEHOLDERS = {
     model: 'Claude',
     config_file: '.kiro/settings.json',
     ask_instruction: 'ask the user directly to clarify what you cannot infer.'
+  },
+  opencode: {
+    model: 'Claude',
+    config_file: 'OPENCODE.md',
+    ask_instruction: 'STOP and call the AskUserQuestionTool to clarify.',
   }
 };
 

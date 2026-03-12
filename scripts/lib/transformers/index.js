@@ -4,3 +4,4 @@ export { transformGemini } from './gemini.js';
 export { transformCodex } from './codex.js';
 export { transformAgents } from './agents.js';
 export { transformKiro } from './kiro.js';
+export { transformOpenCode } from "./opencode.js";

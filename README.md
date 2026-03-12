@@ -95,6 +95,11 @@ cp -r dist/claude-code/.claude your-project/
 cp -r dist/claude-code/.claude/* ~/.claude/
 ```
 
+**OpenCode:**
+```bash
+cp -r dist/opencode/.opencode your-project/
+```
+
 **Gemini CLI:**
 ```bash
 cp -r dist/gemini/.gemini your-project/
@@ -136,6 +141,7 @@ Most commands accept an optional argument to focus on a specific area:
 
 - [Cursor](https://cursor.com)
 - [Claude Code](https://claude.ai/code)
+- [OpenCode](https://opencode.ai)
 - [Gemini CLI](https://github.com/google-gemini/gemini-cli)
 - [Codex CLI](https://github.com/openai/codex)
 
