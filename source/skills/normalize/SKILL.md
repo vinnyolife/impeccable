@@ -12,7 +12,7 @@ Analyze and redesign the feature to perfectly match our design system standards,
 
 ## MANDATORY PREPARATION
 
-Use the frontend-design skill — it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding. Additionally gather: design system documentation and tokens.
+Use the frontend-design skill — it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding.
 
 ---
 
