@@ -82,6 +82,7 @@ async function buildStaticSite() {
   const entrypoints = [
     path.join(ROOT_DIR, 'public', 'index.html'),
     path.join(ROOT_DIR, 'public', 'cheatsheet.html'),
+    path.join(ROOT_DIR, 'public', 'gallery.html'),
   ];
   const outdir = path.join(ROOT_DIR, 'build');
 
@@ -383,7 +384,6 @@ async function build() {
 
   // Remove existing and copy fresh
   if (fs.existsSync(skillsDest)) fs.rmSync(skillsDest, { recursive: true });
-
   copyDirSync(skillsSrc, skillsDest);
 
   console.log(`📋 Synced to .claude/: skills`);

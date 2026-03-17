@@ -14,6 +14,18 @@ Use the frontend-design skill — it contains design principles, anti-patterns, 
 
 ---
 
+## AUTOMATED ANTI-PATTERN SCAN
+
+Before the manual critique, run the deterministic anti-pattern detector bundled with this skill (`scripts/detect-antipatterns.mjs`):
+
+```bash
+node scripts/detect-antipatterns.mjs [target-area]
+```
+
+Include the results in your Anti-Patterns Verdict. If the script finds issues, they MUST appear in the Priority Issues list.
+
+---
+
 Conduct a holistic design critique, evaluating whether the interface actually works—not just technically, but as a designed experience. Think like a design director giving feedback.
 
 ## Design Critique

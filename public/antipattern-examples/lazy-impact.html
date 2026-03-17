@@ -20,8 +20,8 @@
     }
 
     .container {
-      width: 1080px;
-      height: 1080px;
+      max-width: 960px;
+      width: 100%;
       margin: 0 auto;
       background: linear-gradient(180deg, #1a1a2e 0%, #16213e 50%, #0f0f23 100%);
       border-radius: 24px;
@@ -281,22 +281,7 @@
       line-height: 1.4;
     }
 
-    /* Anti-pattern label */
-    .antipattern-label {
-      position: absolute;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.9);
-      color: #f87171;
-      padding: 8px 20px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      z-index: 10;
-      border: 1px solid rgba(248, 113, 113, 0.3);
-    }
+
   </style>
 </head>
 <body>
@@ -387,7 +372,7 @@
       </div>
     </div>
 
-    <div class="antipattern-label">🚨 AI SLOP: Lazy "Impact" (Gradients, Sparklines, Elastic)</div>
   </div>
+<script src="/js/detect-antipatterns-browser.js"></script>
 </body>
 </html>

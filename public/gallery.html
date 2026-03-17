@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gallery of Shame — AI Anti-Patterns in the Wild | Impeccable</title>
+  <meta name="description" content="A curated collection of the most common AI-generated UI anti-patterns. Learn to spot them, laugh at them, then fix them.">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
+  <link rel="canonical" href="https://impeccable.style/gallery">
+
+  <meta property="og:title" content="Gallery of Shame — AI Anti-Patterns | Impeccable">
+  <meta property="og:description" content="A curated collection of the most common AI-generated UI anti-patterns. Learn to spot them, laugh at them, then fix them.">
+  <meta property="og:url" content="https://impeccable.style/gallery">
+  <meta property="og:image" content="https://impeccable.style/og-image.jpg">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Instrument+Sans:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'Instrument Sans', system-ui, sans-serif;
+      --font-mono: 'Space Grotesk', monospace;
+      --color-ink: oklch(10% 0 0);
+      --color-paper: oklch(98% 0 0);
+      --color-cream: oklch(96% 0.005 350);
+      --color-charcoal: oklch(25% 0 0);
+      --color-ash: oklch(55% 0 0);
+      --color-mist: oklch(92% 0 0);
+      --color-bg: oklch(96% 0.005 350);
+      --color-accent: oklch(60% 0.25 350);
+      --color-accent-hover: oklch(52% 0.25 350);
+      --color-shame-red: oklch(55% 0.2 25);
+      --spacing-xs: 8px;
+      --spacing-sm: 16px;
+      --spacing-md: 24px;
+      --spacing-lg: 32px;
+      --spacing-xl: 48px;
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    * { margin: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--color-paper);
+      color: var(--color-ink);
+      line-height: 1.55;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a { color: var(--color-accent); text-decoration: underline; text-underline-offset: 3px; }
+    a:hover { color: var(--color-accent-hover); }
+
+    /* Header */
+    .site-header {
+      padding: var(--spacing-sm) var(--spacing-lg);
+      border-bottom: 1px solid var(--color-mist);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .site-header a { text-decoration: none; }
+    .header-brand {
+      font-family: var(--font-display);
+      font-size: 1.25rem;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--color-ink);
+    }
+    .header-nav { display: flex; gap: var(--spacing-md); font-size: 0.875rem; }
+    .header-nav a { color: var(--color-ash); }
+    .header-nav a:hover { color: var(--color-ink); }
+
+    /* Hero */
+    .hero {
+      max-width: 720px;
+      margin: 0 auto;
+      padding: var(--spacing-xl) var(--spacing-lg);
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--color-shame-red);
+      margin-bottom: var(--spacing-sm);
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.1;
+      color: var(--color-ink);
+      margin-bottom: var(--spacing-md);
+    }
+    .hero p {
+      font-size: 1.125rem;
+      color: var(--color-charcoal);
+      max-width: 52ch;
+      margin: 0 auto;
+    }
+
+    /* Grid */
+    .gallery-grid {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 var(--spacing-lg) var(--spacing-xl);
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: var(--spacing-lg);
+    }
+
+    /* Card */
+    .card {
+      border: 1px solid var(--color-mist);
+      border-radius: 6px;
+      overflow: hidden;
+      background: white;
+      cursor: pointer;
+      transition: box-shadow 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+    }
+    .card:hover {
+      box-shadow: 0 12px 40px -8px rgba(0,0,0,0.12);
+      border-color: var(--color-ash);
+    }
+    .card-thumb {
+      aspect-ratio: 16 / 10;
+      overflow: hidden;
+      position: relative;
+      border-bottom: 1px solid var(--color-mist);
+      background: var(--color-cream);
+    }
+    .card-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .card-thumb-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s var(--ease-out);
+    }
+    .card:hover .card-thumb-overlay { opacity: 1; }
+    .card-thumb-overlay span {
+      color: white;
+      font-family: var(--font-mono);
+      font-size: 0.8125rem;
+      padding: 8px 16px;
+      border: 1px solid rgba(255,255,255,0.4);
+      border-radius: 4px;
+      letter-spacing: 0.05em;
+    }
+    .card-body { padding: var(--spacing-md); }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      font-style: italic;
+      color: var(--color-ink);
+      margin-bottom: var(--spacing-xs);
+      line-height: 1.2;
+    }
+    .card-desc {
+      font-size: 0.875rem;
+      color: var(--color-ash);
+      line-height: 1.5;
+    }
+
+    .card-link {
+      text-decoration: none;
+      color: inherit;
+      display: block;
+    }
+
+    /* Footer */
+    .site-footer {
+      margin-top: var(--spacing-xl);
+      padding: var(--spacing-lg);
+      border-top: 1px solid var(--color-mist);
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--color-ash);
+    }
+    .site-footer a { color: var(--color-ash); }
+    .site-footer a:hover { color: var(--color-ink); }
+    .footer-links { display: flex; gap: var(--spacing-md); justify-content: center; flex-wrap: wrap; }
+
+    @media (max-width: 600px) {
+      .hero { padding: var(--spacing-lg) var(--spacing-sm); }
+      .gallery-grid {
+        grid-template-columns: 1fr;
+        padding: 0 var(--spacing-sm) var(--spacing-lg);
+      }
+      .site-header { padding: var(--spacing-sm); }
+      .header-nav { gap: var(--spacing-sm); }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <a href="/" class="header-brand">Impeccable</a>
+    <nav class="header-nav">
+      <a href="/#antidote">Anti-Patterns</a>
+      <a href="/cheatsheet">Cheatsheet</a>
+      <a href="https://github.com/pbakaus/impeccable">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <p class="hero-eyebrow">Gallery of Shame</p>
+    <h1>The Tell-Tale Signs of AI-Generated UI</h1>
+  </section>
+
+  <div class="gallery-grid" id="gallery"></div>
+
+  <footer class="site-footer">
+    <div class="footer-links">
+      <a href="/">Home</a>
+      <a href="/#antidote">Anti-Patterns</a>
+      <a href="/cheatsheet">Cheatsheet</a>
+      <a href="https://github.com/pbakaus/impeccable">GitHub</a>
+    </div>
+  </footer>
+
+  <script>
+    const items = [
+      {
+        id: 'purple-gradients',
+        title: 'Purple Gradients Everywhere',
+        desc: 'The AI color palette: purple-to-blue gradients on everything. Buttons, text, backgrounds, orbs. It\'s the new "make it pop."',
+      },
+      {
+        id: 'lazy-cool',
+        title: 'Lazy "Cool"',
+        desc: 'Glassmorphism, neon glows, blurred orbs, monospace everything. Looks like a hackathon project, not a product.',
+      },
+      {
+        id: 'lazy-impact',
+        title: 'Lazy "Impact"',
+        desc: 'When in doubt, animate everything. Bouncing buttons, wiggling icons, gradient text, floating badges. Motion without meaning.',
+      },
+      {
+        id: 'thick-border-cards',
+        title: 'Side-Tab Cards',
+        desc: 'A thick colored border on one side of a rounded card. The single most recognizable tell of AI-generated UI.',
+      },
+      {
+        id: 'cardocalypse',
+        title: 'Cardocalypse',
+        desc: 'Cards inside cards inside cards. Five levels of nesting, each with its own padding and shadow. The inception of containers.',
+      },
+      {
+        id: 'layout-templates',
+        title: 'Copy-Paste Layouts',
+        desc: 'The same hero-metric-features template repeated with different colors. When every section looks the same, nothing stands out.',
+      },
+      {
+        id: 'inter-everywhere',
+        title: 'Inter Everywhere',
+        desc: 'One font for everything. Headings, body, labels, buttons. No typographic hierarchy, no personality, no design.',
+      },
+      {
+        id: 'massive-icons',
+        title: 'Massive Icons',
+        desc: 'Icon containers larger than the content they introduce. When the decoration is bigger than the message, priorities are backwards.',
+      },
+      {
+        id: 'bad-contrast',
+        title: 'Bad Contrast Choices',
+        desc: 'Gray text on colored backgrounds, low-contrast labels, unreadable combinations. Looking good and being readable shouldn\'t conflict.',
+      },
+      {
+        id: 'redundant-ux-writing',
+        title: 'Redundant UX Writing',
+        desc: 'Label, sublabel, helper text, and hint text all saying the same thing in slightly different words. Say it once, say it well.',
+      },
+      {
+        id: 'modal-abuse',
+        title: 'Modal Abuse',
+        desc: 'Complex settings crammed into a modal. If it needs a scroll bar and three columns, it deserves its own page.',
+      },
+    ];
+
+    const grid = document.getElementById('gallery');
+
+    grid.innerHTML = items.map(item => `
+      <a class="card-link" href="/antipattern-examples/${item.id}.html" target="_blank" rel="noopener">
+        <article class="card">
+          <div class="card-thumb">
+            <img src="/antipattern-images/${item.id}.png"
+                 alt="${item.title} anti-pattern example"
+                 loading="lazy"
+                 width="540" height="540">
+            <div class="card-thumb-overlay"><span>View live example</span></div>
+          </div>
+          <div class="card-body">
+            <h2 class="card-title">${item.title}</h2>
+            <p class="card-desc">${item.desc}</p>
+          </div>
+        </article>
+      </a>
+    `).join('');
+  </script>
+</body>
+</html>

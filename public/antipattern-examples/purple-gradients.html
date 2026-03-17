@@ -21,8 +21,8 @@
     }
 
     .container {
-      width: 1080px;
-      height: 1080px;
+      max-width: 960px;
+      width: 100%;
       margin: 0 auto;
       background: linear-gradient(145deg, #2a1a4a 0%, #1a0a2e 100%);
       border-radius: 32px;
@@ -189,22 +189,7 @@
       margin-top: 4px;
     }
 
-    /* Anti-pattern label */
-    .antipattern-label {
-      position: absolute;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(0,0,0,0.8);
-      color: #f87171;
-      padding: 8px 20px;
-      border-radius: 8px;
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.5px;
-      z-index: 10;
-      border: 1px solid rgba(248, 113, 113, 0.3);
-    }
+
   </style>
 </head>
 <body>
@@ -250,7 +235,7 @@
       </div>
     </div>
 
-    <div class="antipattern-label">🚨 AI SLOP: Purple Gradients Everywhere</div>
   </div>
+<script src="/js/detect-antipatterns-browser.js"></script>
 </body>
 </html>

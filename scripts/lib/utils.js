@@ -140,6 +140,22 @@ export function readSourceFiles(rootDir) {
             }
           }
 
+          // Read script files if they exist
+          const scripts = [];
+          const scriptsDir = path.join(entryPath, 'scripts');
+          if (fs.existsSync(scriptsDir)) {
+            const scriptFiles = fs.readdirSync(scriptsDir).filter(f => fs.statSync(path.join(scriptsDir, f)).isFile());
+            for (const scriptFile of scriptFiles) {
+              const scriptPath = path.join(scriptsDir, scriptFile);
+              const scriptContent = fs.readFileSync(scriptPath, 'utf-8');
+              scripts.push({
+                name: scriptFile,
+                content: scriptContent,
+                filePath: scriptPath
+              });
+            }
+          }
+
           skills.push({
             name: frontmatter.name || entry.name,
             description: frontmatter.description || '',
@@ -152,7 +168,8 @@ export function readSourceFiles(rootDir) {
             context: frontmatter.context || null,
             body,
             filePath: skillMdPath,
-            references
+            references,
+            scripts
           });
         }
       }

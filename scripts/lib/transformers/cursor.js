@@ -1,62 +1,18 @@
-import path from 'path';
-import { cleanDir, ensureDir, writeFile, generateYamlFrontmatter, replacePlaceholders, prefixSkillReferences } from '../utils.js';
+import { transformProvider } from './shared.js';
 
 /**
- * Cursor Transformer (Skills Only)
- *
- * All skills output to .cursor/skills/{name}/SKILL.md
- * Frontmatter: name, description, license
- *
- * @param {Array} skills - All skills (including user-invokable ones)
- * @param {string} distDir - Distribution output directory
- * @param {Object} patterns - Design patterns data (unused)
- * @param {Object} options - Optional settings
- * @param {string} options.prefix - Prefix to add to user-invokable skill names (e.g., 'i-')
- * @param {string} options.outputSuffix - Suffix for output directory (e.g., '-prefixed')
+ * Cursor Transformer
+ * Output: .cursor/skills/{name}/SKILL.md
  */
 export function transformCursor(skills, distDir, patterns = null, options = {}) {
-  const { prefix = '', outputSuffix = '' } = options;
-  const cursorDir = path.join(distDir, `cursor${outputSuffix}`);
-  const skillsDir = path.join(cursorDir, '.cursor/skills');
-
-  cleanDir(cursorDir);
-  ensureDir(skillsDir);
-
-  const allSkillNames = skills.map(s => s.name);
-  const commandNames = skills.filter(s => s.userInvokable).map(s => `${prefix}${s.name}`);
-  let refCount = 0;
-  for (const skill of skills) {
-    const skillName = `${prefix}${skill.name}`;
-    const skillDir = path.join(skillsDir, skillName);
-
-    const frontmatterObj = {
-      name: skillName,
-      description: skill.description,
-    };
-    if (skill.license) frontmatterObj.license = skill.license;
-
-    const frontmatter = generateYamlFrontmatter(frontmatterObj);
-    let skillBody = replacePlaceholders(skill.body, 'cursor', commandNames);
-    if (prefix) skillBody = prefixSkillReferences(skillBody, prefix, allSkillNames);
-    const content = `${frontmatter}\n\n${skillBody}`;
-    const outputPath = path.join(skillDir, 'SKILL.md');
-    writeFile(outputPath, content);
-
-    // Copy reference files if they exist
-    if (skill.references && skill.references.length > 0) {
-      const refDir = path.join(skillDir, 'reference');
-      ensureDir(refDir);
-      for (const ref of skill.references) {
-        const refOutputPath = path.join(refDir, `${ref.name}.md`);
-        const refContent = replacePlaceholders(ref.content, 'cursor');
-        writeFile(refOutputPath, refContent);
-        refCount++;
-      }
-    }
-  }
-
-  const userInvokableCount = skills.filter(s => s.userInvokable).length;
-  const refInfo = refCount > 0 ? ` (${refCount} reference files)` : '';
-  const prefixInfo = prefix ? ` [${prefix}prefixed]` : '';
-  console.log(`✓ Cursor${prefixInfo}: ${skills.length} skills (${userInvokableCount} user-invokable)${refInfo}`);
+  transformProvider({
+    provider: 'cursor',
+    displayName: 'Cursor',
+    configDir: '.cursor',
+    buildFrontmatter: (skill, skillName) => {
+      const obj = { name: skillName, description: skill.description };
+      if (skill.license) obj.license = skill.license;
+      return obj;
+    },
+  }, skills, distDir, options);
 }

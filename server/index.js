@@ -1,6 +1,7 @@
 import { serve, file } from "bun";
 import homepage from "../public/index.html";
 import cheatsheet from "../public/cheatsheet.html";
+import gallery from "../public/gallery.html";
 import {
   getSkills,
   getCommands,
@@ -16,6 +17,7 @@ const server = serve({
   routes: {
     "/": homepage,
     "/cheatsheet": cheatsheet,
+    "/gallery": gallery,
 
     // Static assets - all public subdirectories
     "/assets/*": async (req) => {
@@ -50,6 +52,18 @@ const server = serve({
       if (await assetFile.exists()) {
         return new Response(assetFile, {
           headers: { "Content-Type": "application/javascript", "X-Content-Type-Options": "nosniff", "X-Frame-Options": "DENY" }
+        });
+      }
+      return new Response("Not Found", { status: 404 });
+    },
+    "/antipattern-images/*": async (req) => {
+      const url = new URL(req.url);
+      if (url.pathname.includes('..')) return new Response("Bad Request", { status: 400 });
+      const filePath = `./public${url.pathname}`;
+      const assetFile = file(filePath);
+      if (await assetFile.exists()) {
+        return new Response(assetFile, {
+          headers: { "X-Content-Type-Options": "nosniff" }
         });
       }
       return new Response("Not Found", { status: 404 });
