@@ -1219,12 +1219,31 @@ if (IS_BROWSER) {
   // Inject hover styles via CSS (more reliable than JS event listeners)
   const styleEl = document.createElement('style');
   styleEl.textContent = `
-    .impeccable-overlay { pointer-events: auto; }
-    .impeccable-overlay .impeccable-tooltip { display: none; }
-    .impeccable-overlay .impeccable-label { display: block; }
-    .impeccable-overlay:hover { border-color: transparent !important; }
-    .impeccable-overlay:hover .impeccable-tooltip { display: block; }
-    .impeccable-overlay:hover .impeccable-label { display: none; }
+    .impeccable-overlay:not(.impeccable-banner) {
+      pointer-events: auto;
+      outline: 2px solid ${OUTLINE_COLOR};
+      outline-offset: 0px;
+      border-radius: 4px;
+      transition: outline-offset 0.2s ease;
+    }
+    .impeccable-overlay:not(.impeccable-banner):hover {
+      outline-offset: 4px;
+      z-index: 100001 !important;
+    }
+    .impeccable-overlay:not(.impeccable-banner):hover .impeccable-label {
+      transform: translateY(-4px);
+    }
+    .impeccable-overlay:not(.impeccable-banner) .impeccable-tooltip {
+      bottom: -28px; top: auto !important;
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.2s ease;
+    }
+    .impeccable-overlay:not(.impeccable-banner):hover .impeccable-tooltip {
+      opacity: 1;
+      transform: translateY(0);
+    }
   `;
   (document.head || document.documentElement).appendChild(styleEl);
 
@@ -1234,15 +1253,33 @@ if (IS_BROWSER) {
     TYPE_LABELS[ap.id] = ap.name.toLowerCase().substring(0, 26);
   }
 
+  function repositionOverlays() {
+    for (const o of overlays) {
+      if (!o._targetEl || o.classList.contains('impeccable-banner')) continue;
+      const rect = o._targetEl.getBoundingClientRect();
+      o.style.top = `${rect.top + scrollY - 2}px`;
+      o.style.left = `${rect.left + scrollX - 2}px`;
+      o.style.width = `${rect.width + 4}px`;
+      o.style.height = `${rect.height + 4}px`;
+    }
+  }
+
+  let resizeRAF;
+  const onResize = () => {
+    cancelAnimationFrame(resizeRAF);
+    resizeRAF = requestAnimationFrame(repositionOverlays);
+  };
+  window.addEventListener('resize', onResize);
+
   const highlight = function(el, findings) {
     const rect = el.getBoundingClientRect();
     const outline = document.createElement('div');
     outline.className = 'impeccable-overlay';
+    outline._targetEl = el;
     Object.assign(outline.style, {
       position: 'absolute',
       top: `${rect.top + scrollY - 2}px`, left: `${rect.left + scrollX - 2}px`,
       width: `${rect.width + 4}px`, height: `${rect.height + 4}px`,
-      border: `2px solid ${OUTLINE_COLOR}`, borderRadius: '4px',
       zIndex: '99999', boxSizing: 'border-box',
     });
 
@@ -1255,6 +1292,7 @@ if (IS_BROWSER) {
       fontSize: '11px', fontFamily: 'system-ui, sans-serif', fontWeight: '600',
       padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap',
       lineHeight: '16px', letterSpacing: '0.02em',
+      transition: 'transform 0.2s ease',
     });
     outline.appendChild(label);
 
@@ -1262,7 +1300,7 @@ if (IS_BROWSER) {
     tooltip.className = 'impeccable-tooltip';
     tooltip.innerHTML = findings.map(f => f.detail || f.snippet).join('<br>');
     Object.assign(tooltip.style, {
-      position: 'absolute', top: '-22px', left: '0',
+      position: 'absolute', bottom: '-28px', left: '0',
       background: 'rgba(0,0,0,0.85)', color: '#e5e5e5',
       fontSize: '11px', fontFamily: 'ui-monospace, monospace',
       padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap',
@@ -1277,7 +1315,7 @@ if (IS_BROWSER) {
   const showPageBanner = function(findings) {
     if (!findings.length) return;
     const banner = document.createElement('div');
-    banner.className = 'impeccable-overlay';
+    banner.className = 'impeccable-overlay impeccable-banner';
     Object.assign(banner.style, {
       position: 'fixed', top: '0', left: '0', right: '0', zIndex: '100000',
       background: LABEL_BG, color: 'white',
