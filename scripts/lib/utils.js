@@ -36,6 +36,9 @@ export function parseFrontmatter(content) {
           const obj = {};
           obj.name = trimmed.slice(7).trim();
           currentArray.push(obj);
+        } else {
+          // Simple string item in array
+          currentArray.push(trimmed.slice(2));
         }
       }
       continue;

@@ -6,38 +6,42 @@ args:
     description: The feature or area to critique (optional)
     required: false
 user-invokable: true
+allowed-tools:
+  - Bash(python3 -m http.server 8384 *)
+  - Bash(kill $(lsof -ti:8384)*)
+  - Bash(lsof -ti:8384*)
+  - Bash(node *detect-antipatterns*)
 ---
 
-## MANDATORY PREPARATION
+## STEPS
 
-Use the frontend-design skill -- it contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding -- if no design context exists yet, you MUST run teach-impeccable first. Additionally gather: what the interface is trying to accomplish.
+### Step 1: Invoke the frontend-design skill
 
----
+Invoke the frontend-design skill (using the Skill tool, not by reading the file). It contains design principles, anti-patterns, and the **Context Gathering Protocol**. Follow the protocol before proceeding -- if no design context exists yet, you MUST run teach-impeccable first. Additionally gather: what the interface is trying to accomplish.
 
-Think like a design director giving feedback. Evaluate whether the interface works as a designed experience.
+### Step 2: Gather assessments
 
-## Design Critique
+Launch two independent assessments. **Neither must see the other's output** to avoid bias.
 
-### AI Slop Detection (CRITICAL)
+If your system supports sub-agents (e.g., Claude Code's Agent tool), delegate each assessment to a separate agent. The sub-agents should return their findings as structured text -- do NOT output findings to the user yet. If sub-agents are not available, complete each assessment sequentially, writing findings to internal notes before proceeding.
 
-**This is the most important check.** Does this look like every other AI-generated interface? Review against ALL **DON'T** guidelines in the frontend-design skill. Check for AI color palette, gradient text, dark glows, glassmorphism, hero metric layouts, identical card grids, generic fonts, and all other tells.
+#### Assessment A: LLM Design Review
 
-**The test**: If someone said "AI made this," would you believe them immediately?
+Read the relevant source files (HTML, CSS, JS/TS) and, if browser automation is available, visually inspect the live page. Think like a design director. Evaluate:
 
-### Holistic Design Review
+**AI Slop Detection (CRITICAL)**: Does this look like every other AI-generated interface? Review against ALL **DON'T** guidelines in the frontend-design skill. Check for AI color palette, gradient text, dark glows, glassmorphism, hero metric layouts, identical card grids, generic fonts, and all other tells. **The test**: If someone said "AI made this," would you believe them immediately?
 
-Evaluate: **visual hierarchy** (eye flow, primary action clarity), **information architecture** (structure, grouping, cognitive load), **emotional resonance** (does it match brand and audience?), **discoverability** (are interactive elements obvious?), **composition** (balance, whitespace, rhythm), **typography** (hierarchy, readability, font choices), **color** (purposeful use, cohesion, accessibility), **states & edge cases** (empty, loading, error, success), **microcopy** (clarity, tone, helpfulness).
+**Holistic Design Review**: visual hierarchy (eye flow, primary action clarity), information architecture (structure, grouping, cognitive load), emotional resonance (does it match brand and audience?), discoverability (are interactive elements obvious?), composition (balance, whitespace, rhythm), typography (hierarchy, readability, font choices), color (purposeful use, cohesion, accessibility), states & edge cases (empty, loading, error, success), microcopy (clarity, tone, helpfulness).
 
----
+Return structured findings covering: AI slop verdict, what's working (2-3 items), priority issues (3-5 with what/why/fix), minor observations, and provocative questions.
 
-## AUTOMATED DETECTION
+#### Assessment B: Automated Detection
 
-**Run this ONLY after you have completed your full Design Critique above.** Do not run the detector before or in parallel with your LLM review. Your unbiased assessment must come first.
+Run the bundled deterministic detector, which flags 25 specific patterns (AI slop tells + general design quality).
 
-The bundled deterministic detector flags 25 specific patterns (AI slop tells + general design quality) and may catch issues you missed.
-
+**CLI scan**:
 ```bash
-node scripts/detect-antipatterns.mjs --json [--fast] [target]
+node {{scripts_path}}/detect-antipatterns.mjs --json [--fast] [target]
 ```
 
 - Pass HTML/JSX/TSX/Vue/Svelte files or directories as `[target]` (anything with markup). Do not pass CSS-only files.
@@ -46,32 +50,38 @@ node scripts/detect-antipatterns.mjs --json [--fast] [target]
 - For 500+ files, narrow scope or ask the user
 - Exit code 0 = clean, 2 = findings
 
-The detector is highly reliable but not perfect. If a finding is clearly a false positive given the context, note it as such.
+**Browser visualization** (when browser automation tools are available AND the target is a viewable page):
 
-### Browser visualization (when available)
-
-If you have browser automation tools (e.g., `mcp__claude-in-chrome__javascript_tool`, Cursor's browser), AND the target is a viewable page, show live visual overlays:
+The overlay is a **visual aid for the user** -- it highlights issues directly in their browser. Do NOT scroll through the page to screenshot overlays. Instead, read the console output to get the results programmatically.
 
 1. **Serve the script**:
    ```bash
-   python3 -m http.server 8384 -d scripts/ &
+   python3 -m http.server 8384 -d {{scripts_path}}/ &
    ```
 2. **Navigate** to the page (use dev server URL for local files, or direct URL)
-3. **Inject** via `javascript_tool`:
+3. **Scroll to top** -- ensure the page is scrolled to the very top before injection
+4. **Inject** via `javascript_tool`:
    ```javascript
    const s = document.createElement('script'); s.src = 'http://localhost:8384/detect-antipatterns-browser.js'; document.head.appendChild(s);
    ```
-4. **Cleanup**: Kill the HTTP server when done.
+5. Wait 2-3 seconds for the detector to render overlays
+6. **Read results from console** using `read_console_messages` with pattern `impeccable` -- the detector logs all findings with the `[impeccable]` prefix. Do NOT scroll through the page to take screenshots of the overlays.
+7. **Cleanup**: Kill the HTTP server when done:
+   ```bash
+   kill $(lsof -ti:8384) 2>/dev/null; echo "done"
+   ```
 
 For multi-view targets, inject on 3-5 representative pages. If injection fails, continue with CLI results only.
 
----
+Return: CLI findings (JSON), browser console findings (if applicable), and any false positives noted.
 
-## Generate Critique Report
+### Step 3: Generate Combined Critique Report
+
+Synthesize both assessments into a single report. Do NOT simply concatenate -- weave the findings together, noting where the LLM review and detector agree, where the detector caught issues the LLM missed, and where detector findings are false positives.
 
 Structure your feedback as a design director would:
 
-### Anti-Patterns Verdict
+#### Anti-Patterns Verdict
 
 **Start here.** Does this look AI-generated?
 
@@ -79,15 +89,15 @@ Structure your feedback as a design director would:
 
 **Deterministic scan**: Summarize what the automated detector found, with counts and file locations. Note any additional issues the detector caught that you missed, and flag any false positives.
 
-**Visual overlays** (if browser was used): Reference what the user can see highlighted in their browser.
+**Visual overlays** (if browser was used): Tell the user that overlays are now visible in their browser, highlighting the detected issues. Summarize what the console output reported.
 
-### Overall Impression
+#### Overall Impression
 A brief gut reaction -- what works, what doesn't, and the single biggest opportunity.
 
-### What's Working
+#### What's Working
 Highlight 2-3 things done well. Be specific about why they work.
 
-### Priority Issues
+#### Priority Issues
 The 3-5 most impactful design problems, ordered by importance:
 
 For each issue:
@@ -96,10 +106,10 @@ For each issue:
 - **Fix**: What to do about it (be concrete)
 - **Command**: Which command to use (prefer: {{available_commands}} -- or other installed skills you're sure exist)
 
-### Minor Observations
+#### Minor Observations
 Quick notes on smaller issues worth addressing.
 
-### Questions to Consider
+#### Questions to Consider
 Provocative questions that might unlock better solutions:
 - "What if the primary action were more prominent?"
 - "Does this need to feel this complex?"

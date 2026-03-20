@@ -36,6 +36,13 @@ export function transformProvider(config, skills, distDir, options = {}) {
     const frontmatter = generateYamlFrontmatter(frontmatterObj);
 
     let skillBody = replacePlaceholders(skill.body, provider, commandNames);
+
+    // Replace {{scripts_path}} with provider-aware path to skill's scripts directory
+    const scriptsPath = provider === 'claude-code'
+      ? '${CLAUDE_PLUGIN_ROOT}/scripts'
+      : `${configDir}/skills/${skillName}/scripts`;
+    skillBody = skillBody.replace(/\{\{scripts_path\}\}/g, scriptsPath);
+
     if (prefix) skillBody = prefixSkillReferences(skillBody, prefix, allSkillNames);
     if (transformBody) skillBody = transformBody(skillBody, skill);
 
