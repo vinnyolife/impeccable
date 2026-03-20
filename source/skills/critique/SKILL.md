@@ -38,7 +38,7 @@ After forming your own assessment, run the bundled deterministic detector to cat
 node scripts/detect-antipatterns.mjs --json [--fast] [target]
 ```
 
-- Pass files or directories as `[target]`
+- Pass HTML/JSX/TSX/Vue/Svelte files or directories as `[target]` (anything with markup). Do not pass CSS-only files.
 - For URLs, skip the CLI scan (it requires Puppeteer). Use browser visualization instead.
 - For large directories (200+ scannable files), use `--fast` (regex-only, skips jsdom)
 - For 500+ files, narrow scope or ask the user
