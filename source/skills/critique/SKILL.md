@@ -36,9 +36,18 @@ Include scan findings in the Anti-Patterns Verdict and Priority Issues. The dete
 
 If you have browser automation tools that control a visual browser in front of the user (e.g., `mcp__claude-in-chrome__javascript_tool`, Cursor's browser), AND the target is a viewable page, enhance the critique with live visual overlays.
 
-1. **Navigate** to the page (use dev server URL for local files, or direct URL)
-2. **Inject** `scripts/detect-antipatterns-browser.js` via `javascript_tool`: read the file and pass its content as JS to evaluate. The IIFE auto-executes and shows pink/magenta outlines with labels on every issue. Do NOT `cat` the file into the conversation first.
-3. **Reference** the overlays in your report: "As highlighted in the browser..."
+1. **Serve the script**: Start a simple HTTP server to serve the detection script:
+   ```bash
+   python3 -m http.server 8384 -d scripts/ &
+   ```
+2. **Navigate** to the page (use dev server URL for local files, or direct URL)
+3. **Inject** via `javascript_tool`: Create a script tag that loads from the local server:
+   ```javascript
+   const s = document.createElement('script'); s.src = 'http://localhost:8384/detect-antipatterns-browser.js'; document.head.appendChild(s);
+   ```
+   The IIFE auto-executes and shows pink/magenta outlines with labels on every issue.
+4. **Reference** the overlays in your report: "As highlighted in the browser..."
+5. **Cleanup**: Kill the HTTP server when done.
 
 For multi-view targets, inject on 3-5 representative pages. If injection fails, continue with CLI results only.
 

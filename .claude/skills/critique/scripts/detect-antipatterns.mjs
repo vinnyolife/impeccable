@@ -149,6 +149,60 @@ const ANTIPATTERNS = [
     description:
       'Dark backgrounds with colored box-shadow glows are the default "cool" look of AI-generated UIs. Use subtle, purposeful lighting instead — or skip the dark theme entirely.',
   },
+  {
+    id: 'line-length',
+    name: 'Line length too long',
+    description:
+      'Text lines wider than ~80 characters are hard to read. The eye loses its place tracking back to the start of the next line. Add a max-width (65ch to 75ch) to text containers.',
+  },
+  {
+    id: 'cramped-padding',
+    name: 'Cramped padding',
+    description:
+      'Text is too close to the edge of its container. Add at least 8px (ideally 12-16px) of padding inside bordered or colored containers.',
+  },
+  {
+    id: 'tight-leading',
+    name: 'Tight line height',
+    description:
+      'Line height below 1.3x the font size makes multi-line text hard to read. Use 1.5 to 1.7 for body text so lines have room to breathe.',
+  },
+  {
+    id: 'small-target',
+    name: 'Small touch target',
+    description:
+      'Interactive elements should be at least 44x44px to be comfortably tappable. Small targets cause misclicks and frustrate users, especially on touch devices.',
+  },
+  {
+    id: 'skipped-heading',
+    name: 'Skipped heading level',
+    description:
+      'Heading levels should not skip (e.g. h1 then h3 with no h2). Screen readers use heading hierarchy for navigation. Skipping levels breaks the document outline.',
+  },
+  {
+    id: 'justified-text',
+    name: 'Justified text',
+    description:
+      'Justified text without hyphenation creates uneven word spacing ("rivers of white"). Use text-align: left for body text, or enable hyphens: auto if you must justify.',
+  },
+  {
+    id: 'tiny-text',
+    name: 'Tiny body text',
+    description:
+      'Body text below 12px is hard to read, especially on high-DPI screens. Use at least 14px for body content, 16px is ideal.',
+  },
+  {
+    id: 'all-caps-body',
+    name: 'All-caps body text',
+    description:
+      'Long passages in uppercase are hard to read. We recognize words by shape (ascenders and descenders), which all-caps removes. Reserve uppercase for short labels and headings.',
+  },
+  {
+    id: 'wide-tracking',
+    name: 'Wide letter spacing on body text',
+    description:
+      'Letter spacing above 0.05em on body text disrupts natural character groupings and slows reading. Reserve wide tracking for short uppercase labels only.',
+  },
 ];
 
 // ─── Section 2: Color Utilities ─────────────────────────────────────────────
@@ -709,6 +763,131 @@ function checkElementAIPaletteDOM(el) {
   return findings;
 }
 
+const QUALITY_TEXT_TAGS = new Set(['p', 'li', 'td', 'th', 'dd', 'blockquote', 'figcaption']);
+const QUALITY_INTERACTIVE_TAGS = new Set(['button', 'a', 'input', 'select', 'textarea']);
+
+function checkElementQualityDOM(el) {
+  const tag = el.tagName.toLowerCase();
+  // Skip browser extension injected elements
+  const elId = el.id || '';
+  if (elId.startsWith('claude-') || elId.startsWith('cic-')) return [];
+  const style = getComputedStyle(el);
+  const findings = [];
+
+  const hasDirectText = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim().length > 10);
+  const textLen = el.textContent?.trim().length || 0;
+  const fontSize = parseFloat(style.fontSize) || 16;
+  const rect = el.getBoundingClientRect();
+
+  // --- Line length too long ---
+  // Only flag if text is long enough to actually fill the line (>80 chars)
+  if (hasDirectText && QUALITY_TEXT_TAGS.has(tag) && rect.width > 0 && textLen > 80) {
+    const charsPerLine = rect.width / (fontSize * 0.5);
+    if (charsPerLine > 85) {
+      findings.push({ id: 'line-length', snippet: `~${Math.round(charsPerLine)} chars/line (aim for <80)` });
+    }
+  }
+
+  // --- Cramped padding (skip small elements like labels/badges) ---
+  if (hasDirectText && textLen > 20 && rect.width > 100 && rect.height > 30) {
+    const borders = {
+      top: parseFloat(style.borderTopWidth) || 0,
+      right: parseFloat(style.borderRightWidth) || 0,
+      bottom: parseFloat(style.borderBottomWidth) || 0,
+      left: parseFloat(style.borderLeftWidth) || 0,
+    };
+    // Need at least 2 borders (a container), or a non-transparent background
+    const borderCount = Object.values(borders).filter(w => w > 0).length;
+    const hasBg = style.backgroundColor && style.backgroundColor !== 'rgba(0, 0, 0, 0)';
+    if (borderCount >= 2 || hasBg) {
+      // Only check padding on sides that have borders or where bg creates containment
+      const paddings = [];
+      if (hasBg || borders.top > 0) paddings.push(parseFloat(style.paddingTop) || 0);
+      if (hasBg || borders.right > 0) paddings.push(parseFloat(style.paddingRight) || 0);
+      if (hasBg || borders.bottom > 0) paddings.push(parseFloat(style.paddingBottom) || 0);
+      if (hasBg || borders.left > 0) paddings.push(parseFloat(style.paddingLeft) || 0);
+      if (paddings.length > 0) {
+        const minPad = Math.min(...paddings);
+        if (minPad < 8) {
+          findings.push({ id: 'cramped-padding', snippet: `${minPad}px padding (need >=8px)` });
+        }
+      }
+    }
+  }
+
+  // --- Tight line height ---
+  if (hasDirectText && textLen > 50 && !['h1','h2','h3','h4','h5','h6'].includes(tag)) {
+    const lineHeight = parseFloat(style.lineHeight);
+    if (lineHeight && lineHeight !== NaN) {
+      const ratio = lineHeight / fontSize;
+      if (ratio < 1.3 && ratio > 0) {
+        findings.push({ id: 'tight-leading', snippet: `line-height ${ratio.toFixed(2)}x (need >=1.3)` });
+      }
+    }
+  }
+
+  // --- Small touch targets ---
+  if (QUALITY_INTERACTIVE_TAGS.has(tag) || el.hasAttribute('tabindex') || el.getAttribute('role') === 'button') {
+    if (rect.width > 0 && rect.height > 0 && (rect.width < 44 || rect.height < 44)) {
+      if (style.display !== 'none' && style.visibility !== 'hidden') {
+        findings.push({ id: 'small-target', snippet: `${Math.round(rect.width)}x${Math.round(rect.height)}px (need 44x44)` });
+      }
+    }
+  }
+
+  // --- Justified text (without hyphens) ---
+  if (hasDirectText && style.textAlign === 'justify') {
+    const hyphens = style.hyphens || style.webkitHyphens || '';
+    if (hyphens !== 'auto') {
+      findings.push({ id: 'justified-text', snippet: 'text-align: justify without hyphens: auto' });
+    }
+  }
+
+  // --- Tiny body text ---
+  if (hasDirectText && textLen > 20 && fontSize < 12) {
+    if (!['sub', 'sup', 'code', 'kbd', 'samp', 'var'].includes(tag)) {
+      findings.push({ id: 'tiny-text', snippet: `${fontSize}px body text` });
+    }
+  }
+
+  // --- All-caps body text ---
+  if (hasDirectText && textLen > 30 && style.textTransform === 'uppercase') {
+    if (!['h1','h2','h3','h4','h5','h6'].includes(tag)) {
+      findings.push({ id: 'all-caps-body', snippet: `text-transform: uppercase on ${textLen} chars of body text` });
+    }
+  }
+
+  // --- Wide letter spacing on body text ---
+  if (hasDirectText && textLen > 20) {
+    const tracking = parseFloat(style.letterSpacing);
+    if (tracking > 0 && style.textTransform !== 'uppercase') {
+      const trackingEm = tracking / fontSize;
+      if (trackingEm > 0.05) {
+        findings.push({ id: 'wide-tracking', snippet: `letter-spacing: ${trackingEm.toFixed(2)}em on body text` });
+      }
+    }
+  }
+
+  return findings;
+}
+
+function checkPageQualityDOM() {
+  const findings = [];
+
+  // --- Skipped heading levels ---
+  const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
+  let prevLevel = 0;
+  for (const h of headings) {
+    const level = parseInt(h.tagName[1]);
+    if (prevLevel > 0 && level > prevLevel + 1) {
+      findings.push({ type: 'skipped-heading', detail: `h${prevLevel} followed by h${level} (missing h${prevLevel + 1})` });
+    }
+    prevLevel = level;
+  }
+
+  return findings;
+}
+
 // Node adapters — take pre-extracted jsdom computed style
 
 function checkElementBorders(tag, style) {
@@ -1040,33 +1219,83 @@ if (IS_BROWSER) {
   const LABEL_BG = 'oklch(55% 0.25 350)';
   const OUTLINE_COLOR = 'oklch(60% 0.25 350)';
 
+  // Inject hover styles via CSS (more reliable than JS event listeners)
+  const styleEl = document.createElement('style');
+  styleEl.textContent = `
+    .impeccable-overlay:not(.impeccable-banner) {
+      pointer-events: auto;
+      outline: 2px solid ${OUTLINE_COLOR};
+      outline-offset: 0px;
+      border-radius: 4px;
+      transition: outline-offset 0.2s ease;
+    }
+    .impeccable-overlay:not(.impeccable-banner):hover {
+      outline-offset: 4px;
+      z-index: 100001 !important;
+    }
+    .impeccable-overlay:not(.impeccable-banner):hover .impeccable-label {
+      transform: translateY(-4px);
+    }
+    .impeccable-overlay:not(.impeccable-banner) .impeccable-tooltip {
+      bottom: -28px; top: auto !important;
+      opacity: 0;
+      transform: translateY(-4px);
+      pointer-events: none;
+      transition: opacity 0.15s ease, transform 0.2s ease;
+    }
+    .impeccable-overlay:not(.impeccable-banner):hover .impeccable-tooltip {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  `;
+  (document.head || document.documentElement).appendChild(styleEl);
+
   const overlays = [];
   const TYPE_LABELS = {};
   for (const ap of ANTIPATTERNS) {
     TYPE_LABELS[ap.id] = ap.name.toLowerCase().substring(0, 26);
   }
 
+  function repositionOverlays() {
+    for (const o of overlays) {
+      if (!o._targetEl || o.classList.contains('impeccable-banner')) continue;
+      const rect = o._targetEl.getBoundingClientRect();
+      o.style.top = `${rect.top + scrollY - 2}px`;
+      o.style.left = `${rect.left + scrollX - 2}px`;
+      o.style.width = `${rect.width + 4}px`;
+      o.style.height = `${rect.height + 4}px`;
+    }
+  }
+
+  let resizeRAF;
+  const onResize = () => {
+    cancelAnimationFrame(resizeRAF);
+    resizeRAF = requestAnimationFrame(repositionOverlays);
+  };
+  window.addEventListener('resize', onResize);
+
   const highlight = function(el, findings) {
     const rect = el.getBoundingClientRect();
     const outline = document.createElement('div');
     outline.className = 'impeccable-overlay';
+    outline._targetEl = el;
     Object.assign(outline.style, {
       position: 'absolute',
       top: `${rect.top + scrollY - 2}px`, left: `${rect.left + scrollX - 2}px`,
       width: `${rect.width + 4}px`, height: `${rect.height + 4}px`,
-      border: `2px solid ${OUTLINE_COLOR}`, borderRadius: '4px',
-      pointerEvents: 'none', zIndex: '99999', boxSizing: 'border-box',
+      zIndex: '99999', boxSizing: 'border-box',
     });
 
     const label = document.createElement('div');
     label.className = 'impeccable-label';
     label.textContent = findings.map(f => TYPE_LABELS[f.type || f.id] || f.type || f.id).join(', ');
     Object.assign(label.style, {
-      position: 'absolute', top: '-20px', left: '0',
+      position: 'absolute', top: '-22px', left: '0',
       background: LABEL_BG, color: 'white',
       fontSize: '11px', fontFamily: 'system-ui, sans-serif', fontWeight: '600',
       padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap',
       lineHeight: '16px', letterSpacing: '0.02em',
+      transition: 'transform 0.2s ease',
     });
     outline.appendChild(label);
 
@@ -1077,21 +1306,10 @@ if (IS_BROWSER) {
       position: 'absolute', bottom: '-28px', left: '0',
       background: 'rgba(0,0,0,0.85)', color: '#e5e5e5',
       fontSize: '11px', fontFamily: 'ui-monospace, monospace',
-      padding: '4px 8px', borderRadius: '3px', whiteSpace: 'nowrap',
-      lineHeight: '16px', display: 'none', zIndex: '100000',
+      padding: '2px 8px', borderRadius: '3px', whiteSpace: 'nowrap',
+      lineHeight: '16px', letterSpacing: '0.02em', zIndex: '100000',
     });
     outline.appendChild(tooltip);
-
-    outline.addEventListener('mouseenter', () => {
-      outline.style.pointerEvents = 'auto';
-      tooltip.style.display = 'block';
-      outline.style.background = 'oklch(60% 0.25 350 / 0.08)';
-    });
-    outline.addEventListener('mouseleave', () => {
-      outline.style.pointerEvents = 'none';
-      tooltip.style.display = 'none';
-      outline.style.background = 'none';
-    });
 
     document.body.appendChild(outline);
     overlays.push(outline);
@@ -1100,7 +1318,7 @@ if (IS_BROWSER) {
   const showPageBanner = function(findings) {
     if (!findings.length) return;
     const banner = document.createElement('div');
-    banner.className = 'impeccable-overlay';
+    banner.className = 'impeccable-overlay impeccable-banner';
     Object.assign(banner.style, {
       position: 'fixed', top: '0', left: '0', right: '0', zIndex: '100000',
       background: LABEL_BG, color: 'white',
@@ -1156,6 +1374,9 @@ if (IS_BROWSER) {
       if (el.classList.contains('impeccable-overlay') ||
           el.classList.contains('impeccable-label') ||
           el.classList.contains('impeccable-tooltip')) continue;
+      // Skip browser extension elements (Claude, etc.)
+      const elId = el.id || '';
+      if (elId.startsWith('claude-') || elId.startsWith('cic-')) continue;
 
       const findings = [
         ...checkElementBordersDOM(el).map(f => ({ type: f.id, detail: f.snippet })),
@@ -1163,6 +1384,7 @@ if (IS_BROWSER) {
         ...checkElementMotionDOM(el).map(f => ({ type: f.id, detail: f.snippet })),
         ...checkElementGlowDOM(el).map(f => ({ type: f.id, detail: f.snippet })),
         ...checkElementAIPaletteDOM(el).map(f => ({ type: f.id, detail: f.snippet })),
+        ...checkElementQualityDOM(el).map(f => ({ type: f.id, detail: f.snippet })),
       ];
 
       if (findings.length > 0) {
@@ -1183,6 +1405,13 @@ if (IS_BROWSER) {
       delete f.el;
       highlight(el, [f]);
       allFindings.push({ el, findings: [f] });
+    }
+
+    // Page-level quality checks (headings, etc.)
+    const qualityFindings = checkPageQualityDOM();
+    if (qualityFindings.length > 0) {
+      showPageBanner(qualityFindings);
+      allFindings.push({ el: document.body, findings: qualityFindings });
     }
 
     // Regex-on-HTML checks (shared with Node)
@@ -1686,9 +1915,9 @@ async function handleStdin() {
 // ---------------------------------------------------------------------------
 
 function printUsage() {
-  console.log(`Usage: node detect-antipatterns.mjs [options] [file-or-dir-or-url...]
+  console.log(`Usage: impeccable detect [options] [file-or-dir-or-url...]
 
-Scan files or URLs for known UI anti-patterns.
+Scan files or URLs for UI anti-patterns and design quality issues.
 
 Options:
   --fast    Regex-only mode (skip jsdom, faster but misses linked stylesheets)
@@ -1702,10 +1931,10 @@ Detection modes:
   --fast         Forces regex for all files
 
 Examples:
-  node detect-antipatterns.mjs src/
-  node detect-antipatterns.mjs index.html
-  node detect-antipatterns.mjs https://example.com
-  node detect-antipatterns.mjs --fast --json .`);
+  impeccable detect src/
+  impeccable detect index.html
+  impeccable detect https://example.com
+  impeccable detect --fast --json .`);
 }
 
 async function main() {
@@ -1769,7 +1998,8 @@ async function main() {
 // ---------------------------------------------------------------------------
 
 if (!IS_BROWSER) {
-  const isMainModule = process.argv[1]?.endsWith('detect-antipatterns.mjs');
+  const isMainModule = process.argv[1]?.endsWith('detect-antipatterns.mjs') ||
+    process.argv[1]?.endsWith('detect-antipatterns.mjs/');
   if (isMainModule) main();
 }
 
@@ -1783,6 +2013,7 @@ export {
   checkElementBorders, checkElementMotion, checkElementGlow, checkPageTypography, checkPageLayout, isNeutralColor, isFullPage,
   detectHtml, detectUrl, detectText,
   walkDir, formatFindings, SCANNABLE_EXTENSIONS, SKIP_DIRS,
+  main as detectCli,
 };
 
 // @browser-strip-end

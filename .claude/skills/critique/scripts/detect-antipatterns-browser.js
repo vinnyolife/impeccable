@@ -770,6 +770,9 @@ const QUALITY_INTERACTIVE_TAGS = new Set(['button', 'a', 'input', 'select', 'tex
 
 function checkElementQualityDOM(el) {
   const tag = el.tagName.toLowerCase();
+  // Skip browser extension injected elements
+  const elId = el.id || '';
+  if (elId.startsWith('claude-') || elId.startsWith('cic-')) return [];
   const style = getComputedStyle(el);
   const findings = [];
 
@@ -787,8 +790,8 @@ function checkElementQualityDOM(el) {
     }
   }
 
-  // --- Cramped padding ---
-  if (hasDirectText && textLen > 10) {
+  // --- Cramped padding (skip small elements like labels/badges) ---
+  if (hasDirectText && textLen > 20 && rect.width > 100 && rect.height > 30) {
     const borders = {
       top: parseFloat(style.borderTopWidth) || 0,
       right: parseFloat(style.borderRightWidth) || 0,
@@ -1373,6 +1376,9 @@ if (IS_BROWSER) {
       if (el.classList.contains('impeccable-overlay') ||
           el.classList.contains('impeccable-label') ||
           el.classList.contains('impeccable-tooltip')) continue;
+      // Skip browser extension elements (Claude, etc.)
+      const elId = el.id || '';
+      if (elId.startsWith('claude-') || elId.startsWith('cic-')) continue;
 
       const findings = [
         ...checkElementBordersDOM(el).map(f => ({ type: f.id, detail: f.snippet })),
