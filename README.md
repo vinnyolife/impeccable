@@ -56,6 +56,43 @@ A comprehensive design skill with 7 domain-specific references ([view skill](sou
 | `/arrange` | Fix layout, spacing, visual rhythm |
 | `/overdrive` | Add technically extraordinary effects |
 
+#### Usage Examples
+
+**`/audit`** - Run quality checks, get a report (no edits)
+```
+/audit blog              # Audit blog hub + post pages
+/audit dashboard         # Check dashboard components
+/audit checkout flow     # Focus on checkout UX
+```
+*When to use:* Before making changes, to understand what needs fixing.
+
+**`/normalize`** - Align with design system
+```
+/normalize blog          # Apply design tokens, fix spacing
+/normalize buttons       # Standardize button styles
+```
+*When to use:* After audit, to fix inconsistencies.
+
+**`/critique`** - UX design review
+```
+/critique landing page   # Review landing page UX
+/critique onboarding     # Check onboarding flow
+```
+*When to use:* When you want design feedback, not technical fixes.
+
+**`/polish`** - Final pass before shipping
+```
+/polish feature modal    # Clean up modal before release
+/polish settings page    # Final review of settings UI
+```
+*When to use:* Last step before deploying to production.
+
+**Combining commands:**
+```
+/audit /normalize /polish blog    # Full workflow: audit → fix → polish
+/critique /harden checkout        # UX review + add error handling
+```
+
 ### Anti-Patterns
 
 The skill includes explicit guidance on what to avoid:

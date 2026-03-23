@@ -62,12 +62,12 @@ describe('transformGemini', () => {
     expect(fs.existsSync(path.join(TEST_DIR, 'gemini/.gemini/skills/skill3/SKILL.md'))).toBe(true);
   });
 
-  test('should handle user-invokable skills with args', () => {
+  test('should handle user-invocable skills with args', () => {
     const skills = [
       {
         name: 'normalize',
         description: 'Normalize design',
-        userInvokable: true,
+        userInvocable: true,
         args: [{ name: 'target', description: 'Target', required: false }],
         body: 'Please normalize {{target}} to match the design system.'
       }
@@ -76,17 +76,17 @@ describe('transformGemini', () => {
     transformGemini(skills, TEST_DIR);
 
     const content = fs.readFileSync(path.join(TEST_DIR, 'gemini/.gemini/skills/normalize/SKILL.md'), 'utf-8');
-    // For user-invokable skills, {{arg}} placeholders become {{args}}
+    // For user-invocable skills, {{arg}} placeholders become {{args}}
     expect(content).toContain('{{args}}');
     expect(content).not.toContain('{{target}}');
   });
 
-  test('should replace multiple different placeholders with {{args}} for user-invokable skills', () => {
+  test('should replace multiple different placeholders with {{args}} for user-invocable skills', () => {
     const skills = [
       {
         name: 'multi-arg',
         description: 'Multiple args',
-        userInvokable: true,
+        userInvocable: true,
         args: [],
         body: 'Process {{input}} and output to {{output}} with {{format}}.'
       }
@@ -99,12 +99,12 @@ describe('transformGemini', () => {
     expect(argsMatches).toHaveLength(3);
   });
 
-  test('should not replace placeholders for non-user-invokable skills', () => {
+  test('should not replace placeholders for non-user-invocable skills', () => {
     const skills = [
       {
         name: 'passive-skill',
         description: 'Passive skill',
-        userInvokable: false,
+        userInvocable: false,
         body: 'Process {{target}} normally.'
       }
     ];
@@ -143,8 +143,8 @@ describe('transformGemini', () => {
     console.log = consoleMock;
 
     const skills = [
-      { name: 'skill1', description: 'Test', license: '', userInvokable: true, body: 'body' },
-      { name: 'skill2', description: 'Test', license: '', userInvokable: false, body: 'body' }
+      { name: 'skill1', description: 'Test', license: '', userInvocable: true, body: 'body' },
+      { name: 'skill2', description: 'Test', license: '', userInvocable: false, body: 'body' }
     ];
 
     transformGemini(skills, TEST_DIR);
@@ -153,7 +153,7 @@ describe('transformGemini', () => {
 
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('✓ Gemini:'));
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('2 skills'));
-    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invokable'));
+    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invocable'));
   });
 
   test('should handle empty arrays', () => {

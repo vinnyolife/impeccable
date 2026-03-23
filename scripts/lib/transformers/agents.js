@@ -5,9 +5,9 @@ import { cleanDir, ensureDir, writeFile, generateYamlFrontmatter, replacePlaceho
  * Agents Transformer (VS Code Copilot + Antigravity)
  *
  * All skills output to .agents/skills/{name}/SKILL.md
- * Frontmatter: name, description, user-invokable (if true), argument-hint (from args)
+ * Frontmatter: name, description, user-invocable (if true), argument-hint (from args)
  *
- * @param {Array} skills - All skills (including user-invokable ones)
+ * @param {Array} skills - All skills (including user-invocable ones)
  * @param {string} distDir - Distribution output directory
  * @param {Object} patterns - Design patterns data (unused)
  * @param {Object} options - Optional settings
@@ -21,7 +21,7 @@ export function transformAgents(skills, distDir, patterns = null, options = {}) 
   ensureDir(skillsDir);
 
   const allSkillNames = skills.map(s => s.name);
-  const commandNames = skills.filter(s => s.userInvokable).map(s => `${prefix}${s.name}`);
+  const commandNames = skills.filter(s => s.userInvocable).map(s => `${prefix}${s.name}`);
   let refCount = 0;
   for (const skill of skills) {
     const skillName = `${prefix}${skill.name}`;
@@ -32,10 +32,10 @@ export function transformAgents(skills, distDir, patterns = null, options = {}) 
       description: skill.description,
     };
 
-    if (skill.userInvokable) frontmatterObj['user-invokable'] = true;
+    if (skill.userInvocable) frontmatterObj['user-invocable'] = true;
 
-    // Build argument-hint from args array for user-invokable skills
-    if (skill.userInvokable && skill.args && skill.args.length > 0) {
+    // Build argument-hint from args array for user-invocable skills
+    if (skill.userInvocable && skill.args && skill.args.length > 0) {
       const hints = skill.args.map(arg => {
         return arg.required ? `<${arg.name}>` : `[${arg.name.toUpperCase()}=<value>]`;
       });
@@ -62,8 +62,8 @@ export function transformAgents(skills, distDir, patterns = null, options = {}) 
     }
   }
 
-  const userInvokableCount = skills.filter(s => s.userInvokable).length;
+  const userInvocableCount = skills.filter(s => s.userInvocable).length;
   const refInfo = refCount > 0 ? ` (${refCount} reference files)` : '';
   const prefixInfo = prefix ? ` [${prefix}prefixed]` : '';
-  console.log(`✓ Agents${prefixInfo}: ${skills.length} skills (${userInvokableCount} user-invokable)${refInfo}`);
+  console.log(`✓ Agents${prefixInfo}: ${skills.length} skills (${userInvocableCount} user-invocable)${refInfo}`);
 }

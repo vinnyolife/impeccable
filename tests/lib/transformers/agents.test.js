@@ -47,12 +47,12 @@ describe('transformAgents', () => {
     expect(parsed.body).toBe('Skill instructions.');
   });
 
-  test('should add user-invokable flag for user-invokable skills', () => {
+  test('should add user-invocable flag for user-invocable skills', () => {
     const skills = [
       {
         name: 'audit',
         description: 'Audit command',
-        userInvokable: true,
+        userInvocable: true,
         body: 'Audit the code.'
       }
     ];
@@ -62,10 +62,10 @@ describe('transformAgents', () => {
     const content = fs.readFileSync(path.join(TEST_DIR, 'agents/.agents/skills/audit/SKILL.md'), 'utf-8');
     const parsed = parseFrontmatter(content);
 
-    expect(parsed.frontmatter['user-invokable']).toBe(true);
+    expect(parsed.frontmatter['user-invocable']).toBe(true);
   });
 
-  test('should not add user-invokable flag for non-user-invokable skills', () => {
+  test('should not add user-invocable flag for non-user-invocable skills', () => {
     const skills = [
       {
         name: 'helper',
@@ -79,7 +79,7 @@ describe('transformAgents', () => {
     const content = fs.readFileSync(path.join(TEST_DIR, 'agents/.agents/skills/helper/SKILL.md'), 'utf-8');
     const parsed = parseFrontmatter(content);
 
-    expect(parsed.frontmatter['user-invokable']).toBeUndefined();
+    expect(parsed.frontmatter['user-invocable']).toBeUndefined();
   });
 
   test('should create argument-hint for required args', () => {
@@ -87,7 +87,7 @@ describe('transformAgents', () => {
       {
         name: 'with-args',
         description: 'Command with args',
-        userInvokable: true,
+        userInvocable: true,
         args: [
           { name: 'target', description: 'Target', required: true },
           { name: 'format', description: 'Format', required: false }
@@ -109,7 +109,7 @@ describe('transformAgents', () => {
       {
         name: 'no-args',
         description: 'No args',
-        userInvokable: true,
+        userInvocable: true,
         args: [],
         body: 'Simple body.'
       }
@@ -123,12 +123,12 @@ describe('transformAgents', () => {
     expect(parsed.frontmatter['argument-hint']).toBeUndefined();
   });
 
-  test('should not add argument-hint for non-user-invokable skills with args', () => {
+  test('should not add argument-hint for non-user-invocable skills with args', () => {
     const skills = [
       {
         name: 'internal',
         description: 'Internal skill',
-        userInvokable: false,
+        userInvocable: false,
         args: [{ name: 'target', description: 'Target', required: true }],
         body: 'Body.'
       }
@@ -188,8 +188,8 @@ describe('transformAgents', () => {
 
   test('should replace {{available_commands}} placeholder', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', userInvokable: true, body: 'Available: {{available_commands}}' },
-      { name: 'polish', description: 'Polish', userInvokable: true, body: 'Polish body.' }
+      { name: 'audit', description: 'Audit', userInvocable: true, body: 'Available: {{available_commands}}' },
+      { name: 'polish', description: 'Polish', userInvocable: true, body: 'Polish body.' }
     ];
 
     transformAgents(skills, TEST_DIR);
@@ -241,7 +241,7 @@ describe('transformAgents', () => {
 
   test('should support prefix option', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', userInvokable: true, body: 'Audit body' }
+      { name: 'audit', description: 'Audit', userInvocable: true, body: 'Audit body' }
     ];
 
     transformAgents(skills, TEST_DIR, null, { prefix: 'i-', outputSuffix: '-prefixed' });
@@ -255,8 +255,8 @@ describe('transformAgents', () => {
 
   test('should prefix skill references in body when prefix is set', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', userInvokable: true, body: 'Run /polish after the audit skill.' },
-      { name: 'polish', description: 'Polish', userInvokable: true, body: 'Polish body.' }
+      { name: 'audit', description: 'Audit', userInvocable: true, body: 'Run /polish after the audit skill.' },
+      { name: 'polish', description: 'Polish', userInvocable: true, body: 'Polish body.' }
     ];
 
     transformAgents(skills, TEST_DIR, null, { prefix: 'i-', outputSuffix: '-prefixed' });
@@ -284,8 +284,8 @@ describe('transformAgents', () => {
     console.log = consoleMock;
 
     const skills = [
-      { name: 'skill1', description: 'Test', userInvokable: true, body: 'body' },
-      { name: 'skill2', description: 'Test', userInvokable: false, body: 'body' }
+      { name: 'skill1', description: 'Test', userInvocable: true, body: 'body' },
+      { name: 'skill2', description: 'Test', userInvocable: false, body: 'body' }
     ];
 
     transformAgents(skills, TEST_DIR);
@@ -294,7 +294,7 @@ describe('transformAgents', () => {
 
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('✓ Agents:'));
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('2 skills'));
-    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invokable'));
+    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invocable'));
   });
 
   test('should log reference file count', () => {

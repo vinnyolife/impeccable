@@ -123,8 +123,8 @@ describe('transformCursor', () => {
     console.log = consoleMock;
 
     const skills = [
-      { name: 'skill1', description: '', license: '', userInvokable: true, body: 'body1' },
-      { name: 'skill2', description: '', license: '', userInvokable: false, body: 'body2' }
+      { name: 'skill1', description: '', license: '', userInvocable: true, body: 'body1' },
+      { name: 'skill2', description: '', license: '', userInvocable: false, body: 'body2' }
     ];
 
     transformCursor(skills, TEST_DIR);
@@ -133,7 +133,7 @@ describe('transformCursor', () => {
 
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('✓ Cursor:'));
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('2 skills'));
-    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invokable'));
+    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invocable'));
   });
 
   test('should handle empty skills array', () => {

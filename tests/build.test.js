@@ -166,7 +166,7 @@ This is a test skill body.`;
     const skillContent = `---
 name: audit
 description: Run technical quality checks
-user-invokable: true
+user-invocable: true
 args:
   - name: target
     description: Target element
@@ -188,31 +188,31 @@ Please audit {{target}} for technical quality. Ask {{model}} for help.`;
     transformers.transformGemini(skills, DIST_DIR, patterns);
     transformers.transformCodex(skills, DIST_DIR, patterns);
 
-    // Verify Cursor: full frontmatter with user-invokable
+    // Verify Cursor: full frontmatter with user-invocable
     const cursorContent = fs.readFileSync(path.join(DIST_DIR, 'cursor/.cursor/skills/audit/SKILL.md'), 'utf-8');
     expect(cursorContent).toContain('---');
     expect(cursorContent).toContain('name: audit');
     expect(cursorContent).toContain('{{target}}');
     expect(cursorContent).toContain('the model');
 
-    // Verify Claude Code: full frontmatter with user-invokable and args
+    // Verify Claude Code: full frontmatter with user-invocable and args
     const claudeContent = fs.readFileSync(path.join(DIST_DIR, 'claude-code/.claude/skills/audit/SKILL.md'), 'utf-8');
     expect(claudeContent).toContain('---');
     expect(claudeContent).toContain('name: audit');
-    expect(claudeContent).toContain('user-invokable: true');
+    expect(claudeContent).toContain('user-invocable: true');
     expect(claudeContent).toContain('{{target}}');
     expect(claudeContent).toContain('Claude');
 
     // Verify Gemini: skill in skills directory
     expect(fs.existsSync(path.join(DIST_DIR, 'gemini/.gemini/skills/audit/SKILL.md'))).toBe(true);
     const geminiContent = fs.readFileSync(path.join(DIST_DIR, 'gemini/.gemini/skills/audit/SKILL.md'), 'utf-8');
-    expect(geminiContent).toContain('{{args}}'); // Replaced for user-invokable in Gemini
+    expect(geminiContent).toContain('{{args}}'); // Replaced for user-invocable in Gemini
     expect(geminiContent).toContain('Gemini');
 
     // Verify Codex: skill in skills directory
     expect(fs.existsSync(path.join(DIST_DIR, 'codex/.codex/skills/audit/SKILL.md'))).toBe(true);
     const codexContent = fs.readFileSync(path.join(DIST_DIR, 'codex/.codex/skills/audit/SKILL.md'), 'utf-8');
-    expect(codexContent).toContain('$TARGET'); // Replaced for user-invokable in Codex
+    expect(codexContent).toContain('$TARGET'); // Replaced for user-invocable in Codex
     expect(codexContent).toContain('GPT');
   });
 

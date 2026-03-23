@@ -7,7 +7,7 @@ import { cleanDir, ensureDir, writeFile, generateYamlFrontmatter, replacePlaceho
  * All skills output to .kiro/skills/{name}/SKILL.md
  * Frontmatter: name, description, license, compatibility, metadata
  *
- * @param {Array} skills - All skills (including user-invokable ones)
+ * @param {Array} skills - All skills (including user-invocable ones)
  * @param {string} distDir - Distribution output directory
  * @param {Object} patterns - Design patterns data (unused)
  * @param {Object} options - Optional settings
@@ -23,7 +23,7 @@ export function transformKiro(skills, distDir, patterns = null, options = {}) {
   ensureDir(skillsDir);
 
   const allSkillNames = skills.map(s => s.name);
-  const commandNames = skills.filter(s => s.userInvokable).map(s => `${prefix}${s.name}`);
+  const commandNames = skills.filter(s => s.userInvocable).map(s => `${prefix}${s.name}`);
   let refCount = 0;
   for (const skill of skills) {
     const skillName = `${prefix}${skill.name}`;
@@ -58,8 +58,8 @@ export function transformKiro(skills, distDir, patterns = null, options = {}) {
     }
   }
 
-  const userInvokableCount = skills.filter(s => s.userInvokable).length;
+  const userInvocableCount = skills.filter(s => s.userInvocable).length;
   const refInfo = refCount > 0 ? ` (${refCount} reference files)` : '';
   const prefixInfo = prefix ? ` [${prefix}prefixed]` : '';
-  console.log(`✓ Kiro${prefixInfo}: ${skills.length} skills (${userInvokableCount} user-invokable)${refInfo}`);
+  console.log(`✓ Kiro${prefixInfo}: ${skills.length} skills (${userInvocableCount} user-invocable)${refInfo}`);
 }

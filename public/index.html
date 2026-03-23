@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-TEXGHC7V34"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-TEXGHC7V34');
+  </script>
+
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Impeccable: The missing upgrade to Anthropic's frontend-design skill</title>
@@ -66,15 +75,15 @@
           <div class="hero-logos-inline">
             <span class="hero-logos-label">Works with</span>
             <div class="hero-logos-row">
-              <img src="assets/cursor-logo.png" alt="Cursor" width="24" height="24" loading="lazy">
-              <img src="assets/claude-logo.png" alt="Claude Code" width="24" height="24" loading="lazy">
-              <img src="assets/gemini-logo.png" alt="Gemini CLI" width="20" height="20" loading="lazy">
-              <img src="assets/openai-logo.png" alt="Codex CLI" width="20" height="20" loading="lazy">
-              <img src="assets/github-logo.png" alt="VS Code Copilot" width="20" height="20" loading="lazy">
-              <img src="assets/antigravity-logo.png" alt="Antigravity" width="20" height="20" loading="lazy">
-              <img src="assets/kiro-logo.png" alt="Kiro" width="20" height="20" loading="lazy">
-              <img src="assets/opencode-logo.png" alt="OpenCode" width="20" height="20" loading="lazy">
-              <img src="assets/pi-logo.svg" alt="Pi" width="20" height="20" loading="lazy" style="background:#1a1a1a;border-radius:50%;padding:3px">
+              <span class="hero-logo-icon has-tooltip" data-tooltip="Cursor"><img src="assets/cursor-logo.png" alt="Cursor" width="24" height="24" loading="lazy"></span>
+              <span class="hero-logo-icon has-tooltip" data-tooltip="Claude Code"><img src="assets/claude-logo.png" alt="Claude Code" width="24" height="24" loading="lazy"></span>
+              <span class="hero-logo-icon has-tooltip" data-tooltip="Gemini CLI"><img src="assets/gemini-logo.png" alt="Gemini CLI" width="20" height="20" loading="lazy"></span>
+              <span class="hero-logo-icon has-tooltip" data-tooltip="Codex CLI"><img src="assets/openai-logo.png" alt="Codex CLI" width="20" height="20" loading="lazy"></span>
+              <span class="hero-logo-icon has-tooltip" data-tooltip="VS Code Copilot"><img src="assets/github-logo.png" alt="VS Code Copilot" width="20" height="20" loading="lazy"></span>
+              <span class="hero-logo-icon has-tooltip" data-tooltip="Antigravity"><img src="assets/antigravity-logo.png" alt="Antigravity" width="20" height="20" loading="lazy"></span>
+              <span class="hero-logo-icon has-tooltip" data-tooltip="Kiro"><img src="assets/kiro-logo.png" alt="Kiro" width="20" height="20" loading="lazy"></span>
+              <span class="hero-logo-icon has-tooltip" data-tooltip="OpenCode"><img src="assets/opencode-logo.png" alt="OpenCode" width="20" height="20" loading="lazy"></span>
+              <span class="hero-logo-icon has-tooltip" data-tooltip="Pi"><img src="assets/pi-logo.svg" alt="Pi" width="20" height="20" loading="lazy" style="background:#1a1a1a;border-radius:50%;padding:3px"></span>
             </div>
           </div>
         </div>
@@ -362,7 +371,7 @@
             <span class="changelog-date">March 4, 2026</span>
           </div>
           <ul class="changelog-items">
-            <li>Unified skills architecture — commands are now skills with <code>user-invokable: true</code></li>
+            <li>Unified skills architecture — commands are now skills with <code>user-invocable: true</code></li>
             <li>Added VS Code Copilot and Google Antigravity support (<code>.agents/skills/</code>)</li>
             <li>New install flow: <code>npx skills add</code> as primary, universal ZIP as fallback</li>
             <li>Added universal ZIP containing all 5 provider directories</li>

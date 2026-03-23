@@ -80,12 +80,12 @@ describe('transformPi', () => {
     expect(content).toContain('metadata: some-metadata');
   });
 
-  test('should not include user-invokable in frontmatter (Pi does not use it)', () => {
+  test('should not include user-invocable in frontmatter (Pi does not use it)', () => {
     const skills = [
       {
         name: 'test',
         description: 'Test',
-        userInvokable: true,
+        userInvocable: true,
         body: 'Body'
       }
     ];
@@ -93,7 +93,7 @@ describe('transformPi', () => {
     transformPi(skills, TEST_DIR);
 
     const content = fs.readFileSync(path.join(TEST_DIR, 'pi/.pi/skills/test/SKILL.md'), 'utf-8');
-    expect(content).not.toContain('user-invokable');
+    expect(content).not.toContain('user-invocable');
   });
 
   test('should handle multiple skills', () => {
@@ -142,8 +142,8 @@ describe('transformPi', () => {
 
   test('should replace {{available_commands}} placeholder', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', userInvokable: true, body: 'Available: {{available_commands}}' },
-      { name: 'polish', description: 'Polish', userInvokable: true, body: 'Polish body.' }
+      { name: 'audit', description: 'Audit', userInvocable: true, body: 'Available: {{available_commands}}' },
+      { name: 'polish', description: 'Polish', userInvocable: true, body: 'Polish body.' }
     ];
 
     transformPi(skills, TEST_DIR);
@@ -180,7 +180,7 @@ describe('transformPi', () => {
       {
         name: 'test',
         description: 'Test',
-        userInvokable: true,
+        userInvocable: true,
         body: 'Body with {{available_commands}}.',
         references: [
           { name: 'ref', content: 'Use {{model}} with {{config_file}}. Commands: {{available_commands}}.', filePath: '/fake/ref.md' }
@@ -198,7 +198,7 @@ describe('transformPi', () => {
 
   test('should support prefix option', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', userInvokable: true, body: 'Audit body' }
+      { name: 'audit', description: 'Audit', userInvocable: true, body: 'Audit body' }
     ];
 
     transformPi(skills, TEST_DIR, null, { prefix: 'i-', outputSuffix: '-prefixed' });
@@ -212,8 +212,8 @@ describe('transformPi', () => {
 
   test('should prefix skill references in body when prefix is set', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', userInvokable: true, body: 'Run /polish after the audit skill.' },
-      { name: 'polish', description: 'Polish', userInvokable: true, body: 'Polish body.' }
+      { name: 'audit', description: 'Audit', userInvocable: true, body: 'Run /polish after the audit skill.' },
+      { name: 'polish', description: 'Polish', userInvocable: true, body: 'Polish body.' }
     ];
 
     transformPi(skills, TEST_DIR, null, { prefix: 'i-', outputSuffix: '-prefixed' });
@@ -241,8 +241,8 @@ describe('transformPi', () => {
     console.log = consoleMock;
 
     const skills = [
-      { name: 'skill1', description: 'Test', userInvokable: true, body: 'body' },
-      { name: 'skill2', description: 'Test', userInvokable: false, body: 'body' }
+      { name: 'skill1', description: 'Test', userInvocable: true, body: 'body' },
+      { name: 'skill2', description: 'Test', userInvocable: false, body: 'body' }
     ];
 
     transformPi(skills, TEST_DIR);
@@ -251,7 +251,7 @@ describe('transformPi', () => {
 
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('✓ Pi:'));
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('2 skills'));
-    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invokable'));
+    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invocable'));
   });
 
   test('should log reference file count', () => {

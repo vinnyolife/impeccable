@@ -89,29 +89,29 @@ Skill body.`;
     expect(result.frontmatter.license).toBe('MIT');
   });
 
-  test('should parse user-invokable boolean', () => {
+  test('should parse user-invocable boolean', () => {
     const content = `---
 name: test-skill
-user-invokable: true
+user-invocable: true
 ---
 
 Body.`;
 
     const result = parseFrontmatter(content);
-    expect(result.frontmatter['user-invokable']).toBe(true);
+    expect(result.frontmatter['user-invocable']).toBe(true);
   });
 
-  test('should parse user-invokable as string true (code behavior)', () => {
+  test('should parse user-invocable as string true (code behavior)', () => {
     const content = `---
 name: test-skill
-user-invokable: 'true'
+user-invocable: 'true'
 ---
 
 Body.`;
 
     const result = parseFrontmatter(content);
     // The parseFrontmatter function doesn't strip quotes from YAML string values
-    expect(result.frontmatter['user-invokable']).toBe("'true'");
+    expect(result.frontmatter['user-invocable']).toBe("'true'");
   });
 
   test('should parse allowed-tools field', () => {
@@ -162,11 +162,11 @@ describe('generateYamlFrontmatter', () => {
     const data = {
       name: 'test',
       description: 'Test',
-      'user-invokable': true
+      'user-invocable': true
     };
 
     const result = generateYamlFrontmatter(data);
-    expect(result).toContain('user-invokable: true');
+    expect(result).toContain('user-invocable: true');
   });
 
   test('should roundtrip: generate and parse back', () => {
@@ -372,11 +372,11 @@ Skill instructions here.`;
     expect(skills[0].body).toBe('Skill instructions here.');
   });
 
-  test('should read skill with user-invokable flag', () => {
+  test('should read skill with user-invocable flag', () => {
     const skillContent = `---
 name: audit
 description: Run technical quality checks
-user-invokable: true
+user-invocable: true
 ---
 
 Audit the code.`;
@@ -388,7 +388,7 @@ Audit the code.`;
     const { skills } = readSourceFiles(testRootDir);
 
     expect(skills).toHaveLength(1);
-    expect(skills[0].userInvokable).toBe(true);
+    expect(skills[0].userInvocable).toBe(true);
   });
 
   test('should read skill with reference files', () => {
@@ -478,7 +478,7 @@ name: test-skill
 description: A comprehensive test skill
 license: Apache-2.0
 compatibility: claude-code
-user-invokable: true
+user-invocable: true
 allowed-tools: Bash,Edit
 ---
 
@@ -494,7 +494,7 @@ Body content.`;
     expect(skills[0].description).toBe('A comprehensive test skill');
     expect(skills[0].license).toBe('Apache-2.0');
     expect(skills[0].compatibility).toBe('claude-code');
-    expect(skills[0].userInvokable).toBe(true);
+    expect(skills[0].userInvocable).toBe(true);
     expect(skills[0].allowedTools).toBe('Bash,Edit');
   });
 });
@@ -677,7 +677,7 @@ describe('prefixSkillReferences', () => {
     const result = prefixSkillReferences('Run /audit then /polish. The audit skill is great.', 'i-', ['audit', 'polish']);
     expect(result).toContain('/i-audit');
     expect(result).toContain('/i-polish');
-    expect(result).toContain('the i-audit skill');
+    expect(result).toContain('The i-audit skill');
   });
 
   test('should not partially match longer skill names', () => {
@@ -687,8 +687,7 @@ describe('prefixSkillReferences', () => {
 
   test('should handle case-insensitive "the X skill" matching', () => {
     const result = prefixSkillReferences('The audit skill is useful.', 'i-', ['audit']);
-    // The regex replaces case-insensitively, so "The" becomes "the" in the replacement
-    expect(result).toBe('the i-audit skill is useful.');
+    expect(result).toBe('The i-audit skill is useful.');
   });
 
   test('should return content unchanged with empty prefix', () => {

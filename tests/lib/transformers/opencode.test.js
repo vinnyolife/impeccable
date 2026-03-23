@@ -48,12 +48,12 @@ describe('transformOpenCode', () => {
     expect(parsed.body).toBe('Skill instructions.');
   });
 
-  test('should add user-invokable flag for user-invokable skills', () => {
+  test('should add user-invocable flag for user-invocable skills', () => {
     const skills = [
       {
         name: 'audit',
         description: 'Audit command',
-        userInvokable: true,
+        userInvocable: true,
         body: 'Audit the code.'
       }
     ];
@@ -63,10 +63,10 @@ describe('transformOpenCode', () => {
     const content = fs.readFileSync(path.join(TEST_DIR, 'opencode/.opencode/skills/audit/SKILL.md'), 'utf-8');
     const parsed = parseFrontmatter(content);
 
-    expect(parsed.frontmatter['user-invokable']).toBe(true);
+    expect(parsed.frontmatter['user-invocable']).toBe(true);
   });
 
-  test('should not add user-invokable flag for non-user-invokable skills', () => {
+  test('should not add user-invocable flag for non-user-invocable skills', () => {
     const skills = [
       {
         name: 'helper',
@@ -80,7 +80,7 @@ describe('transformOpenCode', () => {
     const content = fs.readFileSync(path.join(TEST_DIR, 'opencode/.opencode/skills/helper/SKILL.md'), 'utf-8');
     const parsed = parseFrontmatter(content);
 
-    expect(parsed.frontmatter['user-invokable']).toBeUndefined();
+    expect(parsed.frontmatter['user-invocable']).toBeUndefined();
   });
 
   test('should include args in frontmatter', () => {
@@ -88,7 +88,7 @@ describe('transformOpenCode', () => {
       {
         name: 'with-args',
         description: 'Command with args',
-        userInvokable: true,
+        userInvocable: true,
         args: [
           { name: 'target', description: 'Target element', required: false }
         ],
@@ -111,7 +111,7 @@ describe('transformOpenCode', () => {
       {
         name: 'no-args',
         description: 'No args',
-        userInvokable: true,
+        userInvocable: true,
         args: [],
         body: 'Simple body.'
       }
@@ -234,8 +234,8 @@ describe('transformOpenCode', () => {
 
   test('should replace {{available_commands}} placeholder', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', userInvokable: true, body: 'Available: {{available_commands}}' },
-      { name: 'polish', description: 'Polish', userInvokable: true, body: 'Polish body.' }
+      { name: 'audit', description: 'Audit', userInvocable: true, body: 'Available: {{available_commands}}' },
+      { name: 'polish', description: 'Polish', userInvocable: true, body: 'Polish body.' }
     ];
 
     transformOpenCode(skills, TEST_DIR);
@@ -272,7 +272,7 @@ describe('transformOpenCode', () => {
       {
         name: 'test',
         description: 'Test',
-        userInvokable: true,
+        userInvocable: true,
         body: 'Body with {{available_commands}}.',
         references: [
           { name: 'ref', content: 'Use {{model}} with {{config_file}}. Commands: {{available_commands}}.', filePath: '/fake/ref.md' }
@@ -290,7 +290,7 @@ describe('transformOpenCode', () => {
 
   test('should support prefix option', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', userInvokable: true, body: 'Audit body' }
+      { name: 'audit', description: 'Audit', userInvocable: true, body: 'Audit body' }
     ];
 
     transformOpenCode(skills, TEST_DIR, null, { prefix: 'i-', outputSuffix: '-prefixed' });
@@ -304,8 +304,8 @@ describe('transformOpenCode', () => {
 
   test('should prefix skill references in body when prefix is set', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', userInvokable: true, body: 'Run /polish after the audit skill.' },
-      { name: 'polish', description: 'Polish', userInvokable: true, body: 'Polish body.' }
+      { name: 'audit', description: 'Audit', userInvocable: true, body: 'Run /polish after the audit skill.' },
+      { name: 'polish', description: 'Polish', userInvocable: true, body: 'Polish body.' }
     ];
 
     transformOpenCode(skills, TEST_DIR, null, { prefix: 'i-', outputSuffix: '-prefixed' });
@@ -333,8 +333,8 @@ describe('transformOpenCode', () => {
     console.log = consoleMock;
 
     const skills = [
-      { name: 'skill1', description: 'Test', userInvokable: true, body: 'body' },
-      { name: 'skill2', description: 'Test', userInvokable: false, body: 'body' }
+      { name: 'skill1', description: 'Test', userInvocable: true, body: 'body' },
+      { name: 'skill2', description: 'Test', userInvocable: false, body: 'body' }
     ];
 
     transformOpenCode(skills, TEST_DIR);
@@ -343,7 +343,7 @@ describe('transformOpenCode', () => {
 
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('✓ OpenCode:'));
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('2 skills'));
-    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invokable'));
+    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invocable'));
   });
 
   test('should log reference file count', () => {

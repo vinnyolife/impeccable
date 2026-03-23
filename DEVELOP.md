@@ -9,7 +9,7 @@ This repository uses a **feature-rich source format** that transforms into provi
 ### Why This Approach?
 
 Different providers have different capabilities:
-- **Claude Code, OpenCode**: Full metadata — args, user-invokable, allowed-tools, license, compatibility
+- **Claude Code, OpenCode**: Full metadata — args, user-invocable, allowed-tools, license, compatibility
 - **Codex, Agents**: Args converted to `argument-hint` format
 - **Gemini**: Minimal frontmatter, `{{arg}}` placeholders become `{{args}}`
 - **Cursor, Kiro, Pi**: Basic frontmatter (name, description, license/compatibility)
@@ -34,8 +34,8 @@ Your skill instructions here...
 **Frontmatter fields** (based on [Agent Skills spec](https://agentskills.io/specification)):
 - `name` (required): Skill identifier (1-64 chars, lowercase/numbers/hyphens)
 - `description` (required): What the skill provides (1-1024 chars)
-- `user-invokable` (optional): Boolean — if `true`, the skill can be invoked as a slash command
-- `args` (optional): Array of argument objects (for user-invokable skills)
+- `user-invocable` (optional): Boolean — if `true`, the skill can be invoked as a slash command
+- `args` (optional): Array of argument objects (for user-invocable skills)
   - `name`: Argument identifier
   - `description`: What it's for
   - `required`: Boolean (defaults to false)
@@ -90,27 +90,27 @@ All providers output skills to `dist/{provider}/.{config}/skills/{name}/SKILL.md
 
 ### Claude Code (Full Featured)
 - Output: `dist/claude-code/.claude/skills/{name}/SKILL.md`
-- Frontmatter: name, description, user-invokable, args, license, compatibility, metadata, allowed-tools
+- Frontmatter: name, description, user-invocable, args, license, compatibility, metadata, allowed-tools
 - Preserves `{{arg}}` placeholders in body
 
 ### OpenCode (Full Featured)
 - Output: `dist/opencode/.opencode/skills/{name}/SKILL.md`
-- Frontmatter: name, description, user-invokable, args, license, compatibility, metadata, allowed-tools
+- Frontmatter: name, description, user-invocable, args, license, compatibility, metadata, allowed-tools
 - Same format as Claude Code
 
 ### Gemini CLI
 - Output: `dist/gemini/.gemini/skills/{name}/SKILL.md`
 - Frontmatter: name, description
-- For user-invokable skills: remaining `{{arg}}` placeholders become `{{args}}`
+- For user-invocable skills: remaining `{{arg}}` placeholders become `{{args}}`
 
 ### Codex CLI
 - Output: `dist/codex/.codex/skills/{name}/SKILL.md`
 - Frontmatter: name, description, argument-hint, license
-- For user-invokable skills: `{{argname}}` → `$ARGNAME` (uppercase)
+- For user-invocable skills: `{{argname}}` → `$ARGNAME` (uppercase)
 
 ### Agents (VS Code Copilot, Antigravity)
 - Output: `dist/agents/.agents/skills/{name}/SKILL.md`
-- Frontmatter: name, description, user-invokable, argument-hint
+- Frontmatter: name, description, user-invocable, argument-hint
 - Args converted to `argument-hint` format (e.g., `<target> [FORMAT=<value>]`)
 
 ### Kiro
@@ -170,7 +170,7 @@ The build system uses a modular architecture under `scripts/`:
 - `transformClaudeCode()`: Full metadata with args and allowed-tools
 - `transformGemini()`: Minimal frontmatter, `{{arg}}` → `{{args}}`
 - `transformCodex()`: Args → argument-hint, `{{arg}}` → `$ARGNAME`
-- `transformAgents()`: Args → argument-hint, user-invokable flag
+- `transformAgents()`: Args → argument-hint, user-invocable flag
 - `transformKiro()`: Basic frontmatter with license/compatibility/metadata
 - `transformOpenCode()`: Full metadata (same as Claude Code)
 - `transformPi()`: Basic frontmatter with license/compatibility/metadata

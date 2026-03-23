@@ -51,12 +51,12 @@ describe('transformClaudeCode', () => {
     expect(parsed.body).toBe('Skill instructions.');
   });
 
-  test('should add user-invokable flag for user-invokable skills', () => {
+  test('should add user-invocable flag for user-invocable skills', () => {
     const skills = [
       {
         name: 'audit',
         description: 'Audit command',
-        userInvokable: true,
+        userInvocable: true,
         body: 'Audit the code.'
       }
     ];
@@ -66,15 +66,15 @@ describe('transformClaudeCode', () => {
     const content = fs.readFileSync(path.join(TEST_DIR, 'claude-code/.claude/skills/audit/SKILL.md'), 'utf-8');
     const parsed = parseFrontmatter(content);
 
-    expect(parsed.frontmatter['user-invokable']).toBe(true);
+    expect(parsed.frontmatter['user-invocable']).toBe(true);
   });
 
-  test('should include args in frontmatter for user-invokable skills', () => {
+  test('should include args in frontmatter for user-invocable skills', () => {
     const skills = [
       {
         name: 'test-command',
         description: 'A test command',
-        userInvokable: true,
+        userInvocable: true,
         args: [
           { name: 'target', description: 'The target', required: false },
           { name: 'output', description: 'Output format', required: true }
@@ -100,7 +100,7 @@ describe('transformClaudeCode', () => {
       {
         name: 'simple-skill',
         description: 'Simple skill',
-        userInvokable: true,
+        userInvocable: true,
         args: [],
         body: 'Simple body.'
       }
@@ -162,7 +162,7 @@ describe('transformClaudeCode', () => {
       {
         name: 'with-placeholder',
         description: 'Has placeholder',
-        userInvokable: true,
+        userInvocable: true,
         args: [{ name: 'target', description: 'Target', required: false }],
         body: 'Process {{target}} and generate output.'
       }
@@ -203,8 +203,8 @@ describe('transformClaudeCode', () => {
     console.log = consoleMock;
 
     const skills = [
-      { name: 'skill1', description: 'Test', license: '', userInvokable: true, body: 'body' },
-      { name: 'skill2', description: 'Test', license: '', userInvokable: false, body: 'body' }
+      { name: 'skill1', description: 'Test', license: '', userInvocable: true, body: 'body' },
+      { name: 'skill2', description: 'Test', license: '', userInvocable: false, body: 'body' }
     ];
 
     transformClaudeCode(skills, TEST_DIR);
@@ -213,7 +213,7 @@ describe('transformClaudeCode', () => {
 
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('✓ Claude Code:'));
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('2 skills'));
-    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invokable'));
+    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invocable'));
   });
 
   test('should handle empty arrays', () => {
@@ -228,7 +228,7 @@ describe('transformClaudeCode', () => {
       {
         name: 'test',
         description: 'Test command',
-        userInvokable: true,
+        userInvocable: true,
         args: [
           { name: 'arg1', description: 'First arg', required: true },
           { name: 'arg2', description: 'Second arg', required: false }
@@ -279,7 +279,7 @@ Second paragraph with details.
 
   test('should support prefix option', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', license: '', userInvokable: true, body: 'Audit body' }
+      { name: 'audit', description: 'Audit', license: '', userInvocable: true, body: 'Audit body' }
     ];
 
     transformClaudeCode(skills, TEST_DIR, null, { prefix: 'i-', outputSuffix: '-prefixed' });

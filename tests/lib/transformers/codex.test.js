@@ -55,7 +55,7 @@ describe('transformCodex', () => {
       {
         name: 'with-args',
         description: 'Command with args',
-        userInvokable: true,
+        userInvocable: true,
         args: [
           { name: 'target', description: 'Target', required: true },
           { name: 'output', description: 'Output', required: true }
@@ -77,7 +77,7 @@ describe('transformCodex', () => {
       {
         name: 'optional-args',
         description: 'Command with optional args',
-        userInvokable: true,
+        userInvocable: true,
         args: [
           { name: 'format', description: 'Format', required: false }
         ],
@@ -98,7 +98,7 @@ describe('transformCodex', () => {
       {
         name: 'mixed-args',
         description: 'Mixed args',
-        userInvokable: true,
+        userInvocable: true,
         args: [
           { name: 'input', description: 'Input', required: true },
           { name: 'format', description: 'Format', required: false },
@@ -116,12 +116,12 @@ describe('transformCodex', () => {
     expect(parsed.frontmatter['argument-hint']).toBe('<input> [FORMAT=<value>] <output>');
   });
 
-  test('should transform {{argname}} to $ARGNAME for user-invokable skills', () => {
+  test('should transform {{argname}} to $ARGNAME for user-invocable skills', () => {
     const skills = [
       {
         name: 'normalize',
         description: 'Normalize',
-        userInvokable: true,
+        userInvocable: true,
         args: [{ name: 'target', description: 'Target', required: false }],
         body: 'Please normalize {{target}} to match the design system.'
       }
@@ -141,7 +141,7 @@ describe('transformCodex', () => {
       {
         name: 'multi-arg',
         description: 'Multiple args',
-        userInvokable: true,
+        userInvocable: true,
         args: [],
         body: 'Process {{input}} and output to {{output}} with {{format}}.'
       }
@@ -198,8 +198,8 @@ describe('transformCodex', () => {
     console.log = consoleMock;
 
     const skills = [
-      { name: 'skill1', description: 'Test', license: '', userInvokable: true, body: 'body' },
-      { name: 'skill2', description: 'Test', license: '', userInvokable: false, body: 'body' }
+      { name: 'skill1', description: 'Test', license: '', userInvocable: true, body: 'body' },
+      { name: 'skill2', description: 'Test', license: '', userInvocable: false, body: 'body' }
     ];
 
     transformCodex(skills, TEST_DIR);
@@ -208,7 +208,7 @@ describe('transformCodex', () => {
 
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('✓ Codex:'));
     expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('2 skills'));
-    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invokable'));
+    expect(consoleMock).toHaveBeenCalledWith(expect.stringContaining('1 user-invocable'));
   });
 
   test('should handle empty arrays', () => {
@@ -218,12 +218,12 @@ describe('transformCodex', () => {
     expect(skillDirs).toHaveLength(0);
   });
 
-  test('should handle user-invokable skills without args', () => {
+  test('should handle user-invocable skills without args', () => {
     const skills = [
       {
         name: 'no-args',
         description: 'No args command',
-        userInvokable: true,
+        userInvocable: true,
         args: [],
         body: 'Body content'
       }
@@ -263,7 +263,7 @@ Second line after blank.
 
   test('should support prefix option', () => {
     const skills = [
-      { name: 'audit', description: 'Audit', license: '', userInvokable: true, body: 'Audit body' }
+      { name: 'audit', description: 'Audit', license: '', userInvocable: true, body: 'Audit body' }
     ];
 
     transformCodex(skills, TEST_DIR, null, { prefix: 'i-', outputSuffix: '-prefixed' });

@@ -104,7 +104,7 @@ export function readFilesRecursive(dir, fileList = []) {
 /**
  * Read and parse all source files (unified skills architecture)
  * All source lives in source/skills/{name}/SKILL.md
- * Returns { skills } where each skill has userInvokable flag
+ * Returns { skills } where each skill has userInvocable flag
  */
 export function readSourceFiles(rootDir) {
   const skillsDir = path.join(rootDir, 'source/skills');
@@ -147,7 +147,7 @@ export function readSourceFiles(rootDir) {
             compatibility: frontmatter.compatibility || '',
             metadata: frontmatter.metadata || null,
             allowedTools: frontmatter['allowed-tools'] || '',
-            userInvokable: frontmatter['user-invokable'] === true || frontmatter['user-invokable'] === 'true',
+            userInvocable: frontmatter['user-invocable'] === true || frontmatter['user-invocable'] === 'true',
             args: frontmatter.args || [],
             context: frontmatter.context || null,
             body,
@@ -331,7 +331,10 @@ export function prefixSkillReferences(content, prefix, skillNames) {
     result = result.replace(new RegExp(`\\/(?=${escapeRegex(name)}(?:[^a-zA-Z0-9_-]|$))`, 'g'), `/${prefix}`);
 
     // Replace `the skillname skill` references
-    result = result.replace(new RegExp(`the ${escapeRegex(name)} skill`, 'gi'), `the ${prefixed} skill`);
+    result = result.replace(
+      new RegExp(`(the) ${escapeRegex(name)} skill`, 'gi'),
+      (_, article) => `${article} ${prefixed} skill`
+    );
   }
 
   return result;

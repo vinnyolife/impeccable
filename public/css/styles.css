@@ -1,4 +1,4 @@
-/*! tailwindcss v4.2.1 | MIT License | https://tailwindcss.com */
+/*! tailwindcss v4.2.2 | MIT License | https://tailwindcss.com */
 .split-container::before {
   content: '';
   position: absolute;
@@ -3871,6 +3871,35 @@ code {
   color: var(--color-accent);
   padding: 1px 4px;
   border-radius: 3px;
+}
+.has-tooltip {
+  position: relative;
+  cursor: default;
+}
+.has-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+  border-radius: 6px;
+  white-space: nowrap;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  z-index: 100;
+}
+.has-tooltip:hover::after {
+  opacity: 1;
+}
+.hero-logo-icon {
+  display: inline-flex;
+  align-items: center;
 }
 .download-tip {
   font-size: 0.8125rem;

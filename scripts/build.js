@@ -200,12 +200,12 @@ function generateApiData(buildDir, skills, patterns) {
     id: path.basename(path.dirname(s.filePath)),
     name: s.name,
     description: s.description,
-    userInvokable: s.userInvokable,
+    userInvocable: s.userInvocable,
   }));
   fs.writeFileSync(path.join(apiDir, 'skills.json'), JSON.stringify(skillsData));
 
-  // commands.json (user-invokable skills only)
-  const commandsData = skillsData.filter(s => s.userInvokable);
+  // commands.json (user-invocable skills only)
+  const commandsData = skillsData.filter(s => s.userInvocable);
   fs.writeFileSync(path.join(apiDir, 'commands.json'), JSON.stringify(commandsData));
 
   // patterns.json
@@ -337,8 +337,8 @@ async function build() {
   // Read source files (unified skills architecture)
   const { skills } = readSourceFiles(ROOT_DIR);
   const patterns = readPatterns(ROOT_DIR);
-  const userInvokableCount = skills.filter(s => s.userInvokable).length;
-  console.log(`📖 Read ${skills.length} skills (${userInvokableCount} user-invokable) and ${patterns.patterns.length + patterns.antipatterns.length} pattern categories\n`);
+  const userInvocableCount = skills.filter(s => s.userInvocable).length;
+  console.log(`📖 Read ${skills.length} skills (${userInvocableCount} user-invocable) and ${patterns.patterns.length + patterns.antipatterns.length} pattern categories\n`);
 
   // Transform for each provider
   transformCursor(skills, DIST_DIR, patterns);
@@ -373,20 +373,27 @@ async function build() {
   copyDistToBuild(DIST_DIR, buildDir);
   generateCFConfig(buildDir);
 
-  // Copy Claude Code output to project's .claude directory for local development
-  const claudeCodeSrc = path.join(DIST_DIR, 'claude-code', '.claude');
-  const claudeCodeDest = path.join(ROOT_DIR, '.claude');
+  // Copy all provider outputs to project root for local testing
+  const providers = [
+    { dist: 'claude-code', dir: '.claude' },
+    { dist: 'cursor', dir: '.cursor' },
+    { dist: 'gemini', dir: '.gemini' },
+    { dist: 'codex', dir: '.codex' },
+    { dist: 'agents', dir: '.agents' },
+    { dist: 'kiro', dir: '.kiro' },
+    { dist: 'opencode', dir: '.opencode' },
+    { dist: 'pi', dir: '.pi' },
+  ];
 
-  // Copy skills directory (preserves other files like settings.local.json)
-  const skillsSrc = path.join(claudeCodeSrc, 'skills');
-  const skillsDest = path.join(claudeCodeDest, 'skills');
+  for (const { dist, dir } of providers) {
+    const skillsSrc = path.join(DIST_DIR, dist, dir, 'skills');
+    const skillsDest = path.join(ROOT_DIR, dir, 'skills');
 
-  // Remove existing and copy fresh
-  if (fs.existsSync(skillsDest)) fs.rmSync(skillsDest, { recursive: true });
+    if (fs.existsSync(skillsDest)) fs.rmSync(skillsDest, { recursive: true });
+    copyDirSync(skillsSrc, skillsDest);
+  }
 
-  copyDirSync(skillsSrc, skillsDest);
-
-  console.log(`📋 Synced to .claude/: skills`);
+  console.log(`📋 Synced skills to: ${providers.map(p => p.dir).join(', ')}`);
 
   console.log('\n✨ Build complete!');
 }
