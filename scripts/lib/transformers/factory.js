@@ -46,7 +46,8 @@ const FIELD_SPECS = {
  * @returns {Function} transform(skills, distDir, options?)
  */
 export function createTransformer(config) {
-  const { provider, configDir, displayName, frontmatterFields = [], bodyTransform } = config;
+  const { provider, configDir, displayName, frontmatterFields = [], bodyTransform, placeholderProvider } = config;
+  const placeholderKey = placeholderProvider || provider;
 
   const activeFields = frontmatterFields
     .map((name) => FIELD_SPECS[name])
@@ -86,8 +87,8 @@ export function createTransformer(config) {
       const frontmatter = generateYamlFrontmatter(frontmatterObj);
 
       // Build body
-      const cmdPrefix = (PROVIDER_PLACEHOLDERS[provider] || {}).command_prefix || '/';
-      let skillBody = replacePlaceholders(skill.body, provider, commandNames, allSkillNames);
+      const cmdPrefix = (PROVIDER_PLACEHOLDERS[placeholderKey] || {}).command_prefix || '/';
+      let skillBody = replacePlaceholders(skill.body, placeholderKey, commandNames, allSkillNames);
       if (prefix) skillBody = prefixSkillReferences(skillBody, prefix, allSkillNames, cmdPrefix);
       if (bodyTransform) skillBody = bodyTransform(skillBody, skill);
 
@@ -99,7 +100,7 @@ export function createTransformer(config) {
         const refDir = path.join(skillDir, 'reference');
         ensureDir(refDir);
         for (const ref of skill.references) {
-          const refContent = replacePlaceholders(ref.content, provider, [], allSkillNames);
+          const refContent = replacePlaceholders(ref.content, placeholderKey, [], allSkillNames);
           writeFile(path.join(refDir, `${ref.name}.md`), refContent);
           refCount++;
         }

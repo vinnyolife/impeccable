@@ -57,4 +57,17 @@ export const PROVIDERS = {
     displayName: 'Pi',
     frontmatterFields: ['license', 'compatibility', 'metadata', 'allowed-tools'],
   },
+  'trae-cn': {
+    provider: 'trae-cn',
+    configDir: '.trae-cn',
+    displayName: 'Trae China',
+    placeholderProvider: 'trae',
+    frontmatterFields: ['user-invocable', 'argument-hint', 'license', 'compatibility', 'metadata'],
+  },
+  trae: {
+    provider: 'trae',
+    configDir: '.trae',
+    displayName: 'Trae',
+    frontmatterFields: ['user-invocable', 'argument-hint', 'license', 'compatibility', 'metadata'],
+  },
 };

@@ -159,6 +159,8 @@ This folder contains skills for all supported tools:
   .kiro/      → Kiro
   .opencode/  → OpenCode
   .pi/        → Pi
+  .trae-cn/   → Trae China
+  .trae/      → Trae International
 
 To install, copy the relevant folder(s) into your project root.
 These are hidden folders (dotfiles) — press Cmd+Shift+. in Finder to see them.
@@ -342,26 +344,19 @@ async function build() {
   generateCFConfig(buildDir);
 
   // Copy all provider outputs to project root for local testing
-  const providers = [
-    { dist: 'claude-code', dir: '.claude' },
-    { dist: 'cursor', dir: '.cursor' },
-    { dist: 'gemini', dir: '.gemini' },
-    { dist: 'codex', dir: '.codex' },
-    { dist: 'agents', dir: '.agents' },
-    { dist: 'kiro', dir: '.kiro' },
-    { dist: 'opencode', dir: '.opencode' },
-    { dist: 'pi', dir: '.pi' },
-  ];
+  const syncConfigs = Object.values(PROVIDERS);
 
-  for (const { dist, dir } of providers) {
-    const skillsSrc = path.join(DIST_DIR, dist, dir, 'skills');
-    const skillsDest = path.join(ROOT_DIR, dir, 'skills');
+  for (const { provider, configDir } of syncConfigs) {
+    const skillsSrc = path.join(DIST_DIR, provider, configDir, 'skills');
+    const skillsDest = path.join(ROOT_DIR, configDir, 'skills');
 
-    if (fs.existsSync(skillsDest)) fs.rmSync(skillsDest, { recursive: true });
-    copyDirSync(skillsSrc, skillsDest);
+    if (fs.existsSync(skillsSrc)) {
+      if (fs.existsSync(skillsDest)) fs.rmSync(skillsDest, { recursive: true });
+      copyDirSync(skillsSrc, skillsDest);
+    }
   }
 
-  console.log(`📋 Synced skills to: ${providers.map(p => p.dir).join(', ')}`);
+  console.log(`📋 Synced skills to: ${syncConfigs.map(p => p.configDir).join(', ')}`);
 
   console.log('\n✨ Build complete!');
 }

@@ -17,6 +17,7 @@ Last verified: 2026-03-24
 | Kiro | https://kiro.dev/docs/skills/ |
 | OpenCode | https://opencode.ai/docs/skills/ |
 | Pi | https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/skills.md |
+| Trae | TBD (no official skills docs found yet) |
 
 ## Spec Compliance
 
@@ -63,6 +64,8 @@ Notes:
 | Kiro | `.kiro/skills/` | - |
 | OpenCode | `.opencode/skills/` | `.agents/skills/`, `.claude/skills/` |
 | Pi | `.pi/skills/` | `.agents/skills/` |
+| Trae China | `.trae-cn/skills/` | TBD |
+| Trae International | `.trae/skills/` | TBD |
 
 All harnesses support the `{skill-name}/SKILL.md` directory structure with optional `reference/`, `scripts/`, and `assets/` subdirectories.
 

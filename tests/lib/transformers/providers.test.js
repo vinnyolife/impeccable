@@ -41,7 +41,7 @@ for (const [key, config] of Object.entries(PROVIDERS)) {
       const skills = [{ name: 'test', description: 'Test', body: 'Ask {{model}} for help.' }];
       transform(skills, TEST_DIR);
       const content = fs.readFileSync(skillPath(config, 'test'), 'utf-8');
-      const expected = PROVIDER_PLACEHOLDERS[config.provider].model;
+      const expected = PROVIDER_PLACEHOLDERS[config.placeholderProvider || config.provider].model;
       expect(content).toContain(`Ask ${expected} for help.`);
     });
 
@@ -49,7 +49,7 @@ for (const [key, config] of Object.entries(PROVIDERS)) {
       const skills = [{ name: 'test', description: 'Test', body: 'See {{config_file}}.' }];
       transform(skills, TEST_DIR);
       const content = fs.readFileSync(skillPath(config, 'test'), 'utf-8');
-      const expected = PROVIDER_PLACEHOLDERS[config.provider].config_file;
+      const expected = PROVIDER_PLACEHOLDERS[config.placeholderProvider || config.provider].config_file;
       expect(content).toContain(`See ${expected}.`);
     });
 
