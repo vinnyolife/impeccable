@@ -1260,6 +1260,27 @@ if (IS_BROWSER) {
   };
   window.addEventListener('resize', onResize);
 
+  // Track target element visibility via IntersectionObserver.
+  // Uses a huge rootMargin so all *rendered* elements count as intersecting,
+  // while display:none / closed <details> / hidden modals etc. do not.
+  // This is event-driven -- no polling needed.
+  const visibilityObserver = new IntersectionObserver((entries) => {
+    for (const entry of entries) {
+      const overlay = entry.target._impeccableOverlay;
+      if (!overlay) continue;
+      if (entry.isIntersecting) {
+        overlay.style.display = '';
+        const rect = entry.target.getBoundingClientRect();
+        overlay.style.top = `${rect.top + scrollY - 2}px`;
+        overlay.style.left = `${rect.left + scrollX - 2}px`;
+        overlay.style.width = `${rect.width + 4}px`;
+        overlay.style.height = `${rect.height + 4}px`;
+      } else {
+        overlay.style.display = 'none';
+      }
+    }
+  }, { rootMargin: '99999px' });
+
   const highlight = function(el, findings) {
     const rect = el.getBoundingClientRect();
     const outline = document.createElement('div');
@@ -1296,6 +1317,11 @@ if (IS_BROWSER) {
       lineHeight: '16px', letterSpacing: '0.02em', zIndex: '100000',
     });
     outline.appendChild(tooltip);
+
+    // Start hidden; the IntersectionObserver will show it once the target is rendered
+    outline.style.display = 'none';
+    el._impeccableOverlay = outline;
+    visibilityObserver.observe(el);
 
     document.body.appendChild(outline);
     overlays.push(outline);
@@ -1354,6 +1380,7 @@ if (IS_BROWSER) {
   const scan = function() {
     for (const o of overlays) o.remove();
     overlays.length = 0;
+    visibilityObserver.disconnect();
     const allFindings = [];
 
     for (const el of document.querySelectorAll('*')) {
