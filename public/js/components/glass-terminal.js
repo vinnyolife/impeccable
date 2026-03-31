@@ -253,28 +253,79 @@ function setupFisheyeList(commands) {
     if (!list || !scroll || !items.length) return;
 
     // Fixed item height (matches CSS). All math is index-based.
-    const ITEM_H = 39; // px per item (font 1.5rem * 1.3 line-height + 4px*2 padding)
-    const RADIUS = 4; // items on each side affected by fisheye
+    // -- Fisheye with absolute positioning --
+    // Each item is placed absolutely. Their Y positions are computed by
+    // accumulating scaled heights, so small items cluster together
+    // and the center item gets full space. Scroll position maps linearly
+    // to a fractional "center index" which drives everything.
+
+    const BASE_H = 36; // height of the center (scale=1) item
+    const MIN_SCALE = 0.35;
+    const RADIUS = 5;
     const count = items.length;
+    const listH = list.clientHeight;
+    const centerY = listH / 2;
     let currentActive = -1;
 
-    // Convert scroll position to fractional center index
-    const scrollToFractional = () => {
-        // Scroll area: padding-top puts index 0 at center when scrollTop=0
-        return scroll.scrollTop / ITEM_H;
+    // Total scroll range: one "step" per item
+    const STEP = 30; // px of scroll per item advance
+    const totalScroll = (count - 1) * STEP;
+
+    // Set scroll container height to accommodate the range + centering padding
+    const spacer = document.createElement('div');
+    spacer.style.height = `${totalScroll + listH}px`;
+    scroll.appendChild(spacer);
+    // Initial scroll to center first item
+    scroll.scrollTop = 0;
+
+    // Map scrollTop to fractional center index
+    const getCenterIndex = () => scroll.scrollTop / STEP;
+
+    // Compute eased scale for a given distance from center
+    const getScale = (dist) => {
+        const ratio = Math.max(0, 1 - dist / RADIUS);
+        const eased = ratio * ratio * (3 - 2 * ratio); // smoothstep
+        return MIN_SCALE + eased * (1 - MIN_SCALE);
     };
 
-    // Apply fisheye visual based on fractional center
-    const applyFisheye = (center) => {
-        items.forEach((item, i) => {
+    // Layout: position all items based on current center
+    const layout = (center) => {
+        // First, compute the Y position for each item by accumulating
+        // scaled heights, centered around the center item
+        const heights = items.map((_, i) => {
             const dist = Math.abs(i - center);
-            const ratio = Math.max(0, 1 - dist / RADIUS);
-            // Strong ease-out for dramatic center pop
-            const eased = ratio * ratio * (3 - 2 * ratio); // smoothstep
-            const scale = 0.35 + eased * 0.65;
-            const opacity = 0.06 + eased * 0.94;
+            return BASE_H * getScale(dist);
+        });
+
+        // Find the Y offset so the fractional center position lands at centerY.
+        // Interpolate between the integer positions for smooth scrolling.
+        const floorIdx = Math.max(0, Math.min(count - 1, Math.floor(center)));
+        const frac = center - floorIdx;
+
+        let yAtFloor = 0;
+        for (let i = 0; i < floorIdx; i++) yAtFloor += heights[i];
+        yAtFloor += heights[floorIdx] / 2;
+
+        // If between two items, blend toward the next
+        let yAtCeil = yAtFloor;
+        if (floorIdx < count - 1) {
+            yAtCeil = yAtFloor + heights[floorIdx] / 2 + heights[floorIdx + 1] / 2;
+        }
+        const yAtCenter = yAtFloor + (yAtCeil - yAtFloor) * frac;
+        const offset = centerY - yAtCenter + scroll.scrollTop;
+
+        // Position each item
+        let y = offset;
+        items.forEach((item, i) => {
+            const h = heights[i];
+            const dist = Math.abs(i - center);
+            const scale = getScale(dist);
+            const opacity = 0.25 + (scale - MIN_SCALE) / (1 - MIN_SCALE) * 0.75;
+
+            item.style.top = `${y}px`;
             item.style.transform = `scale(${scale})`;
             item.style.opacity = opacity;
+            y += h;
         });
     };
 
@@ -288,19 +339,20 @@ function setupFisheyeList(commands) {
 
     const scrollToIndex = (idx, behavior = 'smooth') => {
         idx = Math.max(0, Math.min(count - 1, idx));
-        scroll.scrollTo({ top: idx * ITEM_H, behavior });
+        scroll.scrollTo({ top: idx * STEP, behavior });
     };
 
-    // Scroll: update fisheye + activate nearest
+    // Scroll handler
     let raf = null;
     scroll.addEventListener('scroll', () => {
         if (raf) cancelAnimationFrame(raf);
         raf = requestAnimationFrame(() => {
-            const center = scrollToFractional();
-            applyFisheye(center);
+            const center = getCenterIndex();
+            layout(center);
             activate(Math.round(center));
         });
     }, { passive: true });
+
 
     // Click to jump
     items.forEach((item, i) => {
@@ -313,12 +365,8 @@ function setupFisheyeList(commands) {
     // Init
     const startIdx = magazineState.currentIndex;
     currentActive = -1;
-    // Set padding so index 0 sits at center and last index sits at center
-    const padH = list.clientHeight / 2 - ITEM_H / 2;
-    scroll.style.paddingTop = `${padH}px`;
-    scroll.style.paddingBottom = `${padH}px`;
-    scroll.scrollTop = startIdx * ITEM_H;
-    applyFisheye(startIdx);
+    scroll.scrollTop = startIdx * STEP;
+    layout(startIdx);
     activate(startIdx);
 }
 

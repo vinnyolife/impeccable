@@ -131,13 +131,14 @@
   position: relative;
   height: 520px;
   overflow: hidden;
-  mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
-  -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+  mask-image: linear-gradient(to bottom, transparent 2%, black 12%, black 88%, transparent 98%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 2%, black 12%, black 88%, transparent 98%);
 }
 .fisheye-scroll {
   height: 100%;
   overflow-y: auto;
   scrollbar-width: none;
+  position: relative;
 }
 .fisheye-scroll::-webkit-scrollbar {
   display: none;
@@ -150,8 +151,9 @@
   color: var(--color-ink);
   background: none;
   border: none;
-  padding: 4px 0;
-  height: 39px;
+  padding: 0;
+  position: absolute;
+  left: 0;
   cursor: pointer;
   white-space: nowrap;
   text-align: left;
