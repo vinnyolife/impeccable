@@ -69,15 +69,7 @@ const categoryLabels = {
 function renderDesktopLayout(container, commands) {
     magazineState.commands = commands;
 
-    // Determine starting index from URL hash
-    const hash = window.location.hash;
-    let startIndex = 0;
-    if (hash && hash.startsWith('#cmd-')) {
-        const cmdId = hash.slice(5);
-        const idx = commands.findIndex(c => c.id === cmdId);
-        if (idx >= 0) startIndex = idx;
-    }
-    magazineState.currentIndex = startIndex;
+    let startIndex = -1;
 
     // Filter out deprecated shims, then sort by category
     const deprecated = new Set(['teach-impeccable', 'frontend-design', 'impeccable']);
@@ -105,6 +97,17 @@ function renderDesktopLayout(container, commands) {
     filteredCommands.length = 0;
     filteredCommands.push(...orderedCommands);
     magazineState.commands = filteredCommands;
+
+    // Determine starting index: URL hash takes priority, otherwise default to "clarify"
+    const hash = window.location.hash;
+    if (hash && hash.startsWith('#cmd-')) {
+        const idx = filteredCommands.findIndex(c => c.id === hash.slice(5));
+        if (idx >= 0) startIndex = idx;
+    }
+    if (startIndex < 0) {
+        startIndex = Math.max(0, filteredCommands.findIndex(c => c.id === 'clarify'));
+    }
+    magazineState.currentIndex = startIndex;
 
     // Build spreads HTML (after ordering so indices match fisheye)
     const spreadsHTML = filteredCommands.map((cmd, i) => renderSpread(cmd, i, i === startIndex)).join('');

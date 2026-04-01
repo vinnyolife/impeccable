@@ -127,6 +127,13 @@
   align-items: start;
   overflow: hidden;
 }
+@media (min-width: 1100px) {
+  .magazine-container {
+    background: white;
+    border-radius: 16px;
+    padding: var(--spacing-lg);
+  }
+}
 .fisheye-list {
   position: relative;
   height: 400px;
@@ -273,7 +280,7 @@
   gap: 6px;
   flex-wrap: nowrap;
   margin-top: var(--spacing-xs);
-  overflow: hidden;
+  white-space: nowrap;
 }
 .spread-flow-label {
   font-family: var(--font-body);
@@ -375,7 +382,6 @@
   color: var(--color-ash);
   text-align: center;
   padding: var(--spacing-sm) var(--spacing-md);
-  background: var(--color-paper);
 }
 .spread-demo-area .demo-container {
   flex: 1;
@@ -1463,7 +1469,6 @@
   font-size: 0.6875rem;
   letter-spacing: 0.03em;
   color: var(--color-ash);
-  background: var(--color-paper);
   text-align: center;
 }
 .uxw-demo {
@@ -4371,105 +4376,262 @@ code {
   padding: var(--spacing-2xl) 0;
   border-top: 1px solid var(--color-mist);
 }
+@media (min-width: 1100px) {
+  .platforms-section {
+    border-top: none;
+  }
+}
 .platforms-section .section-subtitle {
   max-width: 60ch;
 }
-.install-steps {
+.install-paths {
+  display: grid;
+  grid-template-columns: 5fr 3fr 3fr;
+  gap: 0 var(--spacing-xl);
+  align-items: start;
+  margin: 0 0 var(--spacing-xl);
+}
+.install-path {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xl);
-  max-width: 640px;
-  margin: 0 auto var(--spacing-xl);
 }
-.install-step-header {
-  display: flex;
-  align-items: flex-start;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-md);
+.install-path:first-child {
+  border-right: 1px solid var(--color-mist);
+  padding-right: var(--spacing-xl);
 }
-.install-step-number {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  border: 1.5px solid var(--color-accent);
+.install-path-secondary {
+  border-right: 1px solid var(--color-mist);
+  padding-right: var(--spacing-xl);
+}
+.install-path-label {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
   color: var(--color-accent);
+}
+.install-path-secondary .install-path-label {
+  color: var(--color-ash);
+}
+.install-path-title {
   font-family: var(--font-display);
-  font-size: 1.125rem;
+  font-size: 1.5rem;
   font-weight: 600;
-  line-height: 1;
+  margin: var(--spacing-xs) 0 var(--spacing-sm);
+  line-height: 1.2;
 }
-.install-step-meta {
-  padding-top: 6px;
-}
-.install-step-title {
-  font-size: 1.125rem;
+.install-path-badge {
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
   font-weight: 600;
-  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  border-radius: 3px;
+  padding: 2px 6px;
+  vertical-align: middle;
+  margin-left: 6px;
+  position: relative;
+  top: -2px;
+}
+.install-path-badge-muted {
+  color: var(--color-ash);
+  border-color: var(--color-mist);
+}
+.install-path-desc {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--color-charcoal);
+  margin: 0 0 var(--spacing-md);
+}
+.install-path-terminal {
+  margin-bottom: var(--spacing-sm);
+}
+.install-path-terminal .glass-terminal {
+  height: auto;
+}
+.install-path-terminal .terminal-body {
+  padding: 0;
+}
+.install-path-next {
+  font-size: 0.8125rem;
+  color: var(--color-charcoal);
+  line-height: 1.5;
+  margin-top: auto;
+  padding-top: var(--spacing-md);
+}
+.install-path-next code {
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-ink);
+}
+.install-path-slash {
+  color: var(--color-accent);
+}
+.install-path-subcommands {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: var(--spacing-sm);
+}
+.install-path-subcommand {
+  font-size: 0.75rem;
+  color: var(--color-charcoal);
   line-height: 1.4;
 }
-.install-step-desc {
-  font-size: 0.875rem;
+.install-path-subcommand code {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  background: var(--color-mist);
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-right: 4px;
+}
+.install-path-link {
+  margin-top: auto;
+  padding-top: var(--spacing-md);
+  font-size: 0.8125rem;
+}
+.install-path-link a {
+  color: var(--color-accent);
+  text-decoration: none;
+}
+.install-path-link a:hover {
+  text-decoration: underline;
+}
+.install-together {
+  max-width: 960px;
+  margin: 0 0 var(--spacing-xl);
+  border: 1px solid var(--color-mist);
+  border-radius: 8px;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+.install-together-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+.install-together-badge {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-accent);
+  border: 1px solid var(--color-accent);
+  padding: 2px 10px;
+  border-radius: 99px;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+.install-together-text {
+  font-size: 0.8125rem;
+  line-height: 1.55;
   color: var(--color-ash);
-  margin: 2px 0 0;
+  margin: 0;
 }
-.install-subscribe {
-  max-width: 640px;
-  margin: 0 auto;
+.install-path-step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid currentColor;
+  font-size: 0.5rem;
+  font-weight: 700;
+  line-height: 1;
+  margin-right: 4px;
+  vertical-align: 1px;
 }
-.install-subscribe iframe {
+.install-updated-subscribe {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+.install-updated-subscribe iframe {
   display: block;
   max-width: 100%;
 }
-.install-subscribe-btn {
+.install-updated-x {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  font-size: 0.9375rem;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  color: var(--color-paper);
-  text-decoration: none;
-  padding: 1rem 2rem;
-  background: var(--color-ink);
-  border: 1px solid var(--color-ink);
-  transition: all var(--duration-base) var(--ease-out);
-  flex-shrink: 0;
-  position: relative;
-  overflow: hidden;
-}
-.install-subscribe-btn::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--color-accent);
-  transform: translateY(100%);
-  transition: transform var(--duration-base) var(--ease-out);
-  z-index: 0;
-}
-.install-subscribe-btn:hover::before {
-  transform: translateY(0);
-}
-.install-subscribe-btn svg, .install-subscribe-btn span {
-  position: relative;
-  z-index: 1;
-}
-.install-subscribe-btn:hover {
-  color: var(--color-paper);
-}
-.install-subscribe-note {
+  gap: 6px;
   font-size: 0.8125rem;
-  color: var(--color-ash);
-  margin: 0;
-  line-height: 1.5;
+  font-weight: 600;
+  color: var(--color-ink);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
 }
-@media (max-width: 600px) {
-  .install-subscribe {
-    flex-direction: column;
-    align-items: flex-start;
+.install-updated-x:hover {
+  color: var(--color-accent);
+}
+.install-updated-refs {
+  margin-top: auto;
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--color-mist);
+}
+.install-updated-refs-label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-ash);
+  margin-bottom: 8px;
+}
+.install-updated-ref {
+  display: block;
+  font-size: 0.8125rem;
+  color: var(--color-charcoal);
+  text-decoration: none;
+  margin-bottom: 6px;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+a.install-updated-ref:hover {
+  color: var(--color-accent);
+}
+.install-updated-ref-terminal {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--color-charcoal);
+  background: var(--color-cream);
+  border: 1px solid var(--color-mist);
+  border-radius: 6px;
+  padding: 6px 10px;
+  margin-top: 8px;
+}
+.install-updated-ref-terminal .terminal-prompt {
+  color: var(--color-ash);
+  font-size: 0.75rem;
+}
+.install-updated-ref-terminal code {
+  font-family: inherit;
+  font-size: inherit;
+  background: none;
+  padding: 0;
+  color: var(--color-ink);
+}
+@media (max-width: 900px) {
+  .install-paths {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+  }
+  .install-path:first-child, .install-path-secondary {
+    border-right: none;
+    padding-right: 0;
+    padding-bottom: var(--spacing-xl);
+    border-bottom: 1px solid var(--color-mist);
   }
 }
 .install-terminal {
