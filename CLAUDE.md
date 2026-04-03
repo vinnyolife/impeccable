@@ -52,23 +52,23 @@ Unit tests (build, detector logic) run via `bun test`. Fixture tests (jsdom-base
 
 ## CLI
 
-Impeccable includes a CLI for running anti-pattern detection outside of AI harnesses:
+The detection engine lives in a separate package: [`@impeccable/detect`](https://github.com/pbakaus/impeccable-detect) (BSL-1.1).
 
 ```bash
-node bin/impeccable detect [file-or-dir-or-url...]   # detect anti-patterns
-node bin/impeccable detect --fast --json src/         # regex-only, JSON output
-node bin/impeccable --help                            # show help
+npx @impeccable/detect [file-or-dir-or-url...]   # detect anti-patterns
+npx @impeccable/detect --fast --json src/         # regex-only, JSON output
+npx @impeccable/detect live                       # start browser overlay server
+npx @impeccable/detect --help                     # show help
+```
+
+Or via the main CLI:
+
+```bash
+node bin/impeccable detect [file-or-dir-or-url...]
+node bin/impeccable live [--port=PORT]
 ```
 
 **IMPORTANT**: Always use `node` (not `bun`) to run the detect CLI. Bun's jsdom implementation is extremely slow and will cause scans with HTML files to hang for minutes.
-
-The detection script is at `source/skills/critique/scripts/detect-antipatterns.mjs`. It auto-detects browser vs Node and works as both:
-- **CLI/Node**: jsdom for HTML, regex for CSS/JSX/TSX, Puppeteer for URLs
-- **Browser**: visual overlays injected via `<script src="/js/detect-antipatterns-browser.js">`
-
-Build the browser script: `node scripts/build-browser-detector.js`
-
-**IMPORTANT**: The browser script is **generated** from `detect-antipatterns.mjs` -- never edit the browser `.js` files directly. All changes must go in the `.mjs` source. The build strips Node-specific sections and wraps it in an IIFE. Running `bun run build` also regenerates it, which will **overwrite** any direct edits to the browser script.
 
 ## Versioning
 

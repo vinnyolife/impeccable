@@ -35,10 +35,9 @@ function generateCounts(rootDir, skills, buildDir) {
   });
   const commandCount = activeCommands.length;
 
-  // Count detection rules from source
-  const detectorSrc = fs.readFileSync(
-    path.join(rootDir, 'source/skills/critique/scripts/detect-antipatterns.mjs'), 'utf-8'
-  );
+  // Count detection rules from @impeccable/detect package
+  const detectPkgPath = path.join(rootDir, 'node_modules/@impeccable/detect/src/detect-antipatterns.mjs');
+  const detectorSrc = fs.readFileSync(detectPkgPath, 'utf-8');
   const ruleIds = new Set();
   for (const match of detectorSrc.matchAll(/^\s+id: '([^']+)'/gm)) {
     ruleIds.add(match[1]);
@@ -443,13 +442,6 @@ async function build() {
 
   // Generate authoritative counts and validate references
   generateCounts(ROOT_DIR, skills, buildDir);
-
-  // Generate browser anti-pattern detector (after skill sync so it doesn't get overwritten)
-  try {
-    execSync('node scripts/build-browser-detector.js', { cwd: ROOT_DIR, stdio: 'inherit' });
-  } catch (error) {
-    console.error('Failed to build browser detector:', error.message);
-  }
 
   console.log('\n✨ Build complete!');
 }

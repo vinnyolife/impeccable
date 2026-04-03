@@ -43,7 +43,7 @@
     "dev": "bun run server/index.js",
     "preview": "bun run build && wrangler pages dev",
     "deploy": "bun run build && wrangler pages deploy build/",
-    "test": "bun test tests/build.test.js tests/detect-antipatterns.test.js && node --test tests/detect-antipatterns-fixtures.test.mjs",
+    "test": "bun test tests/build.test.js",
     "screenshot": "bun run scripts/screenshot-antipatterns.js",
     "og-image": "bun run scripts/generate-og-image.js"
   },

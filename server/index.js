@@ -51,10 +51,11 @@ const server = serve({
       const headers = { "Content-Type": "application/javascript", "X-Content-Type-Options": "nosniff", "X-Frame-Options": "DENY" };
       const publicFile = file(`./public${url.pathname}`);
       if (await publicFile.exists()) return new Response(publicFile, { headers });
-      // Built browser detector served at /js/detect-antipatterns-browser.js
-      const basename = url.pathname.split('/').pop();
-      const builtFile = file(`./.claude/skills/critique/scripts/${basename}`);
-      if (await builtFile.exists()) return new Response(builtFile, { headers });
+      // Browser detector served from @impeccable/detect package
+      if (url.pathname === '/js/detect-antipatterns-browser.js') {
+        const pkgFile = file('./node_modules/@impeccable/detect/src/detect-antipatterns-browser.js');
+        if (await pkgFile.exists()) return new Response(pkgFile, { headers });
+      }
       return new Response("Not Found", { status: 404 });
     },
     // Test fixtures (for browser visual testing)
