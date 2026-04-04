@@ -6,8 +6,7 @@ user-invocable: true
 allowed-tools:
   - Bash(npx @impeccable/detect *)
   - Bash(npx impeccable detect *)
-  - Bash(kill $(lsof -ti:*)*)
-  - Bash(lsof -ti:*)
+  - Bash(npx impeccable live *)
 ---
 
 ## STEPS
@@ -89,9 +88,9 @@ The overlay is a **visual aid for the user** -- it highlights issues directly in
    ```
 6. Wait 2--3 seconds for the detector to render overlays
 7. **Read results from console** using `read_console_messages` with pattern `impeccable` -- the detector logs all findings with the `[impeccable]` prefix. Do NOT scroll through the page to take screenshots of the overlays.
-8. **Cleanup**: Kill the live server when done:
+8. **Cleanup**: Stop the live server when done:
    ```bash
-   kill $(lsof -ti:PORT) 2>/dev/null; echo "done"
+   npx @impeccable/detect live stop
    ```
 
 For multi-view targets, inject on 3--5 representative pages. If injection fails, continue with CLI results only.
