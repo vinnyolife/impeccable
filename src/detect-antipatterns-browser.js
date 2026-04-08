@@ -1269,12 +1269,25 @@ function checkElementQuality(el, style, tag, window) {
   return checkQuality({ el, tag, style, hasDirectText, textLen, fontSize, lineHeightPx, letterSpacingPx, rect: null });
 }
 
-function checkElementBorders(tag, style) {
+function checkElementBorders(tag, style, overrides) {
   const sides = ['Top', 'Right', 'Bottom', 'Left'];
   const widths = {}, colors = {};
   for (const s of sides) {
     widths[s] = parseFloat(style[`border${s}Width`]) || 0;
     colors[s] = style[`border${s}Color`] || '';
+    // jsdom silently drops any border shorthand containing var(), leaving
+    // both width and color empty on the computed style. When the detectHtml
+    // pre-pass pulled a resolved value off the rule, use it to fill in the
+    // missing side so the side-tab check can run. Real browsers resolve
+    // var() natively, so this fallback is a no-op in the browser path.
+    if (widths[s] === 0 && overrides && overrides[s]) {
+      widths[s] = overrides[s].width;
+      colors[s] = overrides[s].color;
+    } else if (colors[s] && colors[s].startsWith('var(') && overrides && overrides[s]) {
+      // Longhand case: jsdom kept the width but left the color as the
+      // literal `var(...)` string. Substitute the resolved color.
+      colors[s] = overrides[s].color;
+    }
   }
   return checkBorders(tag, widths, colors, parseFloat(style.borderRadius) || 0);
 }

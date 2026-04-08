@@ -95,23 +95,29 @@ describe('detectHtml — jsdom fixtures', () => {
     // shaped labels are checked while plain inline form labels still pass.
     const f = await detectHtml(path.join(FIXTURES, 'modern-color-borders.html'));
     const sideTabs = f.filter(r => r.antipattern === 'side-tab');
-    // Eight FLAG cases: oklch x3, oklab, lch, lab — all colored border-left
+    // Twelve FLAG cases: oklch x3, oklab, lch, lab — all colored border-left
     // with a non-zero border-radius — plus two card-shaped <label> cases
-    // (one oklch, one rgb). Each must produce exactly one side-tab.
+    // (one oklch, one rgb), plus four var()-based cases (shorthand, mixed
+    // neutral+colored, border-right, and a card-shaped <label>). Each must
+    // produce exactly one side-tab.
     assert.equal(
-      sideTabs.length, 8,
-      `expected 8 side-tab findings from the FLAG column, got ${sideTabs.length}: ${sideTabs.map(r => r.snippet).join('; ')}`
+      sideTabs.length, 12,
+      `expected 12 side-tab findings from the FLAG column, got ${sideTabs.length}: ${sideTabs.map(r => r.snippet).join('; ')}`
     );
-    // Every finding must be a border-left (never right/top/bottom) since
-    // that's the only side the fixture decorates.
-    for (const r of sideTabs) {
-      assert.match(r.snippet || '', /border-left:/, `expected border-left, got ${r.snippet}`);
-    }
+    // Eleven findings must be border-left; exactly one is border-right
+    // (the #flag-var-right case). The fixture doesn't decorate top/bottom
+    // on any flag element.
+    const leftFindings = sideTabs.filter(r => /border-left/.test(r.snippet || ''));
+    const rightFindings = sideTabs.filter(r => /border-right/.test(r.snippet || ''));
+    assert.equal(leftFindings.length, 11, `expected 11 border-left findings, got ${leftFindings.length}`);
+    assert.equal(rightFindings.length, 1, `expected 1 border-right finding, got ${rightFindings.length}`);
     // PASS column must contribute zero border findings of either flavor.
-    // There are 10 pass cases: 6 structural neutrals plus 4 labels (plain
+    // There are 13 pass cases: 6 structural neutrals plus 4 labels (plain
     // inline form label, label with a neutral gray border, label in a form
-    // row, and a label with a thin 1px colored left border). If any leaks
-    // through, the label exception is over-broad.
+    // row, and a label with a thin 1px colored left border), plus 3 var()
+    // pass cases (neutral-resolving var, thin var, uniform all-sides var).
+    // If any leaks through, the label exception or var() fallback is
+    // over-broad.
     const borderAccent = f.filter(r => r.antipattern === 'border-accent-on-rounded');
     assert.equal(
       borderAccent.length, 0,
