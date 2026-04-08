@@ -319,9 +319,12 @@ main#main {
   display: grid;
   grid-template-columns: var(--skills-sidebar-width) minmax(0, 1fr);
   gap: clamp(var(--spacing-lg), 4vw, var(--spacing-2xl));
-  max-width: var(--width-max);
-  margin: 0 auto;
-  padding: 0 clamp(1.25rem, 3vw, 2.5rem);
+  /*
+   * Match horizontal padding to .site-header so the sidebar content lines
+   * up with the brand logo in the nav bar above. Intentionally no max-width
+   * so the docs-browser feels wall-to-wall on wide screens.
+   */
+  padding: 0 clamp(var(--spacing-md), 4vw, var(--spacing-2xl));
   align-items: start;
 }
 
@@ -381,8 +384,8 @@ main#main {
   text-transform: uppercase;
   letter-spacing: 0.14em;
   color: var(--color-ash);
-  margin-bottom: 4px;
-  padding: 0 10px;
+  margin-bottom: 6px;
+  padding: 0;
 }
 
 .skills-sidebar-list {
@@ -397,14 +400,19 @@ main#main {
 
 .skills-sidebar-list a {
   display: block;
-  padding: 3px 10px;
+  /* No left padding: text starts at the column edge so it lines up with
+     the header logo. The 2px active accent lives 2px to the left via a
+     negative margin, sitting in the layout's horizontal padding gutter. */
+  padding: 4px 0;
+  margin-left: -2px;
+  border-left: 2px solid transparent;
+  padding-left: 2px;
   font-family: var(--font-mono);
-  font-size: 0.8125rem;
+  font-size: 0.875rem;
   font-weight: 500;
   line-height: 1.5;
   color: var(--color-charcoal);
   text-decoration: none;
-  border-left: 2px solid transparent;
   transition: color var(--duration-fast) var(--ease-out),
               border-color var(--duration-fast) var(--ease-out);
 }
@@ -619,22 +627,28 @@ main#main {
 }
 
 .skill-detail-title {
-  font-family: var(--font-mono);
-  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 5.5vw, 5rem);
   font-weight: 600;
+  line-height: 0.95;
   letter-spacing: -0.02em;
   color: var(--color-ink);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  white-space: nowrap;
+}
+
+.skill-detail-title-slash {
+  color: var(--color-accent);
+  font-weight: 300;
 }
 
 .skill-detail-tagline {
-  font-family: var(--font-display);
-  font-size: clamp(1.125rem, 2vw, 1.5rem);
-  font-style: italic;
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.4vw, 1.125rem);
   font-weight: 400;
   color: var(--color-charcoal);
-  line-height: 1.4;
-  max-width: 58ch;
+  line-height: 1.55;
+  max-width: 60ch;
   margin-bottom: var(--spacing-md);
 }
 

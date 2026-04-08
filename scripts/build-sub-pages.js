@@ -87,7 +87,7 @@ ${refBody}
 <article class="skill-detail">
   <header class="skill-detail-header">
     <p class="skill-detail-eyebrow"><a href="/skills">Skills</a> / ${escapeHtml(categoryLabel)}</p>
-    <h1 class="skill-detail-title">/${escapeHtml(skill.id)}</h1>
+    <h1 class="skill-detail-title"><span class="skill-detail-title-slash">/</span>${escapeHtml(skill.id)}</h1>
     <p class="skill-detail-tagline">${escapeHtml(tagline)}</p>
     ${metaStrip}
   </header>
