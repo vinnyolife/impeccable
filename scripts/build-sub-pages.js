@@ -108,45 +108,108 @@ ${bodyHtml}
 }
 
 /**
- * Render the /skills index page body.
+ * Render the left sidebar used across the /skills section.
+ * Shows every skill grouped by category. Pass the current skill id to
+ * mark it with aria-current="page".
  */
-function renderSkillsIndex(skillsByCategory) {
+function renderSkillsSidebar(skillsByCategory, currentSkillId = null) {
   let html = `
-<article class="sub-page-content">
-  <header class="sub-page-header">
-    <p class="sub-page-eyebrow">22 commands</p>
-    <h1 class="sub-page-title">Skills</h1>
-    <p class="sub-page-lede">One skill (/impeccable) teaches your AI design. Twenty-one commands steer the result. Each one is a small, opinionated tool that knows how to fix one specific thing.</p>
-  </header>
+<aside class="skills-sidebar" aria-label="All skills">
+  <div class="skills-sidebar-inner">
+    <p class="skills-sidebar-label">Skills</p>
 `;
 
   for (const category of CATEGORY_ORDER) {
     const list = skillsByCategory[category] || [];
     if (list.length === 0) continue;
     html += `
-  <section class="skills-category" data-category="${category}">
-    <div class="skills-category-header">
-      <h2 class="skills-category-title">${escapeHtml(CATEGORY_LABELS[category])}</h2>
-      <p class="skills-category-desc">${escapeHtml(CATEGORY_DESCRIPTIONS[category])}</p>
-    </div>
-    <ul class="skills-category-list">
+    <div class="skills-sidebar-group" data-category="${category}">
+      <p class="skills-sidebar-group-title">${escapeHtml(CATEGORY_LABELS[category])}</p>
+      <ul class="skills-sidebar-list">
 ${list
-  .map(
-    (s) => `      <li class="skills-category-item">
-        <a href="/skills/${s.id}" class="skills-category-link">
-          <span class="skills-category-name">/${escapeHtml(s.id)}</span>
-          <span class="skills-category-desc-text">${escapeHtml(s.description)}</span>
-        </a>
-      </li>`,
-  )
+  .map((s) => {
+    const current = s.id === currentSkillId ? ' aria-current="page"' : '';
+    return `        <li><a href="/skills/${s.id}"${current}>/${escapeHtml(s.id)}</a></li>`;
+  })
   .join('\n')}
-    </ul>
-  </section>
+      </ul>
+    </div>
 `;
   }
 
-  html += `</article>`;
+  html += `
+  </div>
+</aside>`;
   return html;
+}
+
+/**
+ * Render the /skills overview main column content (not the sidebar).
+ * This is the orientation piece — what are skills, how to pick one,
+ * the six categories explained with inline cross-links to the detail pages.
+ */
+function renderSkillsOverviewMain(skillsByCategory) {
+  const totalSkills = Object.values(skillsByCategory).reduce(
+    (sum, list) => sum + list.length,
+    0,
+  );
+
+  let categoriesHtml = '';
+  for (const category of CATEGORY_ORDER) {
+    const list = skillsByCategory[category] || [];
+    if (list.length === 0) continue;
+
+    const skillChips = list
+      .map(
+        (s) =>
+          `<a class="skills-overview-chip" href="/skills/${s.id}">/${escapeHtml(s.id)}</a>`,
+      )
+      .join('');
+
+    categoriesHtml += `
+    <section class="skills-overview-category" data-category="${category}" id="category-${category}">
+      <div class="skills-overview-category-meta">
+        <h2 class="skills-overview-category-title">${escapeHtml(CATEGORY_LABELS[category])}</h2>
+        <p class="skills-overview-category-count">${list.length} ${list.length === 1 ? 'skill' : 'skills'}</p>
+      </div>
+      <p class="skills-overview-category-desc">${escapeHtml(CATEGORY_DESCRIPTIONS[category])}</p>
+      <div class="skills-overview-chips">
+${skillChips}
+      </div>
+    </section>
+`;
+  }
+
+  return `
+<div class="skills-overview-content">
+  <header class="skills-overview-header">
+    <p class="sub-page-eyebrow">${totalSkills} commands</p>
+    <h1 class="sub-page-title">Skills</h1>
+    <p class="sub-page-lede">One skill (<a href="/skills/impeccable">/impeccable</a>) teaches your AI design. Twenty more commands steer the result. Each one is a small, opinionated tool that knows how to fix one specific thing &mdash; pick the one that matches the moment.</p>
+  </header>
+
+  <section class="skills-overview-howto">
+    <h2 class="skills-overview-howto-title">How to pick one</h2>
+    <p>Every skill is named after the intent you bring to it. If you&rsquo;re reviewing something, reach for <a href="/skills/critique">/critique</a> or <a href="/skills/audit">/audit</a>. If you&rsquo;re improving type, reach for <a href="/skills/typeset">/typeset</a>. If you want a last-mile pass before shipping, reach for <a href="/skills/polish">/polish</a>. The categories below group them by the job you&rsquo;re doing.</p>
+  </section>
+
+  <div class="skills-overview-categories">
+${categoriesHtml}
+  </div>
+</div>`;
+}
+
+/**
+ * Wrap sidebar + main content in the docs-browser layout shell.
+ */
+function wrapInDocsLayout(sidebarHtml, mainHtml) {
+  return `
+<div class="skills-layout">
+  ${sidebarHtml}
+  <div class="skills-main">
+${mainHtml}
+  </div>
+</div>`;
 }
 
 /**
@@ -171,15 +234,18 @@ export async function generateSubPages(rootDir) {
 
   const generated = [];
 
-  // Skills index
+  // Skills index — docs-browser layout with sticky sidebar.
   {
+    const sidebar = renderSkillsSidebar(data.skillsByCategory, null);
+    const main = renderSkillsOverviewMain(data.skillsByCategory);
     const html = renderPage({
       title: 'Skills — Impeccable',
       description:
-        '22 commands that teach your AI harness how to design. Browse by category: create, evaluate, refine, simplify, harden, system.',
-      bodyHtml: renderSkillsIndex(data.skillsByCategory),
+        '21 commands that teach your AI harness how to design. Browse by category: create, evaluate, refine, simplify, harden, system.',
+      bodyHtml: wrapInDocsLayout(sidebar, main),
       activeNav: 'skills',
       canonicalPath: '/skills',
+      bodyClass: 'sub-page skills-layout-page',
     });
     const out = path.join(outDirs.skills, 'index.html');
     fs.writeFileSync(out, html, 'utf-8');
