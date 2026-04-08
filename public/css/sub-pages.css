@@ -1070,10 +1070,14 @@ main#main {
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
 }
 
+/* Before | caption | After all on one row. The caption lives in the
+   middle column; if a skill has no caption we emit an empty <span> so
+   the grid still has three cells and Before/After sit at the edges. */
 .split-labels {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: var(--spacing-md);
   margin-top: 10px;
   font-family: var(--font-mono);
   font-size: 0.6875rem;
@@ -1085,18 +1089,27 @@ main#main {
 
 .split-label-item[data-point="before"] {
   color: var(--color-ash);
+  justify-self: start;
 }
 
 .split-label-item[data-point="after"] {
   color: var(--color-accent);
+  justify-self: end;
 }
 
 .skill-demo-caption {
+  margin: 0;
+  font-family: var(--font-body);
   font-size: 0.8125rem;
+  font-weight: 400;
+  text-transform: none;
+  letter-spacing: 0;
   color: var(--color-ash);
-  margin-top: 12px;
   font-style: italic;
-  max-width: 500px;
+  text-align: center;
+  justify-self: center;
+  /* Allow wrapping inside the middle column if the text is long. */
+  max-width: 100%;
 }
 
 .skill-demo-eyebrow {

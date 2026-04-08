@@ -52,9 +52,9 @@ function renderSkillDemo(skill) {
     </div>
     <div class="split-labels">
       <span class="split-label-item" data-point="before">Before</span>
+      ${caption ? `<p class="skill-demo-caption">${escapeHtml(caption)}</p>` : '<span></span>'}
       <span class="split-label-item" data-point="after">After</span>
     </div>
-    ${caption ? `<p class="skill-demo-caption">${escapeHtml(caption)}</p>` : ''}
   </div>
 </section>`;
 }
