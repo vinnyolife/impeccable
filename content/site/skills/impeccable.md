@@ -6,11 +6,15 @@ tagline: "The design intelligence behind every other skill."
 
 `/impeccable` is the foundation. It teaches your AI harness how to design, period. Every other command in this pack leans on it for design principles, anti-patterns, typography, color, and layout guidance.
 
-There are three ways to use it:
+Call `/impeccable` directly when you want freeform design with the full guidebook loaded. Or use one of the two sub-modes:
 
-- **`/impeccable` (freeform)** -- Design with the full guidebook loaded. You describe what you want, and the model builds it with strong aesthetic opinions, anti-pattern awareness, and your project's design context. Best for when you already know what you want and just need it built well.
-- <span id="craft">**`/impeccable craft`**</span> -- The full shape-then-build flow. It starts by running `/shape` internally (a structured discovery interview about purpose, audience, and goals), then moves into implementation with visual iteration, checking the result in the browser until the polish is high. Best for brand-new features where you want to think before you build, without managing the steps yourself.
-- <span id="teach">**`/impeccable teach`**</span> -- One-time project setup. Runs a short discovery interview about your brand, audience, and aesthetic direction, then writes a `.impeccable.md` file that every future skill call reads automatically. Run this once per project before doing any design work.
+### /impeccable craft {#craft}
+
+The full shape-then-build flow. It starts by running `/shape` internally (a structured discovery interview about purpose, audience, and goals), then moves into implementation with visual iteration, checking the result in the browser until the polish is high. Best for brand-new features where you want to think before you build, without managing the steps yourself.
+
+### /impeccable teach {#teach}
+
+One-time project setup. Runs a short discovery interview about your brand, audience, and aesthetic direction, then writes a `.impeccable.md` file that every future skill call reads automatically. Run this once per project before doing any design work.
 
 ## How it works
 

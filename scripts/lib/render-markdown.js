@@ -39,10 +39,20 @@ export function createRenderer({ knownSkillIds = new Set(), currentSkillId = nul
   const renderer = new marked.Renderer();
 
   // Heading slugger — stable ids so we can anchor-link from elsewhere.
+  // Supports {#custom-id} suffix (kramdown/pandoc style) for explicit anchors.
   renderer.heading = ({ tokens, depth }) => {
-    const text = renderer.parser.parseInline(tokens);
     const raw = tokens.map((t) => t.raw || '').join('');
-    const id = slugify(raw);
+    const customIdMatch = raw.match(/\s*\{#([a-z0-9_-]+)\}\s*$/i);
+    let id, text;
+    if (customIdMatch) {
+      id = customIdMatch[1];
+      // Strip the {#id} suffix from the rendered text
+      const cleanRaw = raw.slice(0, customIdMatch.index);
+      text = renderer.parser.parseInline(marked.lexer(cleanRaw, { gfm: true })[0]?.tokens || tokens);
+    } else {
+      id = slugify(raw);
+      text = renderer.parser.parseInline(tokens);
+    }
     return `<h${depth} id="${id}">${text}</h${depth}>\n`;
   };
 
