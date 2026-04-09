@@ -120,7 +120,7 @@ export const skillRelationships = {
 };
 
 export const commandRelationships = {
-  'shape': { flow: 'Create: Plan UX and UI through structured discovery (included in /impeccable craft)' },
+  'shape': { flow: 'Create: Plan UX and UI through structured discovery' },
   'impeccable craft': { flow: 'Create: Full shape-then-build flow with visual iteration' },
   'impeccable': { flow: 'Create: Freeform design with full design intelligence' },
   'onboard': { combinesWith: ['clarify', 'delight'], flow: 'Create: Onboarding flows and empty states' },
