@@ -2,7 +2,7 @@
 name: impeccable
 description: "Design fluency for frontend interfaces. Build distinctive, production-grade web components, pages, artifacts, posters, and applications with high design quality. Also handles: critique/review/evaluate designs, audit accessibility/performance/responsive, polish finishing touches, improve typography/fonts/readability, fix layout/spacing/hierarchy, add animation/transitions/motion, adapt for mobile/tablet/responsive, simplify/declutter/distill, amplify bland/generic/safe designs, tone down loud/overwhelming designs, add color to gray/monochromatic interfaces, improve UX copy/labels/error messages, harden for production with edge cases/i18n/errors, design onboarding/first-run/empty states/activation flows, optimize slow/laggy performance, plan UX before coding, extract design tokens, push boundaries with shaders/physics/scroll effects, or visually iterate on elements in the browser with live variant mode. Commands: craft, teach, extract, live, pin, audit, critique, polish, shape, adapt, animate, bolder, quieter, colorize, clarify, delight, distill, harden, onboard, layout, optimize, overdrive, typeset."
 version: 3.0.0
-argument-hint: "[command] [target]"
+argument-hint: "[craft|shape · audit|critique · animate|bolder|colorize|delight|layout|overdrive|quieter|typeset · adapt|clarify|distill · harden|onboard|optimize|polish · teach|extract|live] [target]"
 license: Apache 2.0. Based on Anthropic's frontend-design skill. See NOTICE.md for attribution.
 ---
 

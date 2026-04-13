@@ -43,7 +43,7 @@ const EXCLUDED_SKILLS = new Set([
  * Mirrors public/js/data.js commandCategories. Validated below: the
  * generator fails if any user-invocable skill is missing from this map.
  */
-const SKILL_CATEGORIES = {
+export const SKILL_CATEGORIES = {
   // CREATE - build something new
   impeccable: 'create',
   craft: 'create',
