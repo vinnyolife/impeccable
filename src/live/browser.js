@@ -279,9 +279,18 @@
   function updateBarContent(mode) {
     if (!barEl || barEl.style.display === 'none') return;
     barEl.innerHTML = '';
+    // Reset bar styling
+    barEl.style.background = C.paper;
+    barEl.style.border = '1px solid ' + C.mist;
     if (mode === 'configure') barEl.appendChild(buildConfigureRow());
     else if (mode === 'generating') barEl.appendChild(buildGeneratingRow());
     else if (mode === 'cycling') barEl.appendChild(buildCyclingRow());
+    else if (mode === 'saving') barEl.appendChild(buildSavingRow());
+    else if (mode === 'confirmed') {
+      barEl.appendChild(buildConfirmedRow());
+      barEl.style.background = 'oklch(95% 0.05 145)';
+      barEl.style.border = '1px solid oklch(75% 0.12 145 / 0.4)';
+    }
   }
 
   // --- Configure row ---
@@ -474,6 +483,60 @@
     discard.addEventListener('click', (e) => { e.stopPropagation(); handleDiscard(); });
     row.appendChild(discard);
 
+    return row;
+  }
+
+  // --- Shared UI builders ---
+
+  // --- Saving row (waiting for agent to process accept/discard) ---
+
+  function buildSavingRow() {
+    const row = el('div', {
+      display: 'flex', alignItems: 'center', gap: '8px',
+      padding: '2px 8px',
+    });
+    const spinner = el('div', {
+      width: '14px', height: '14px', borderRadius: '50%',
+      border: '2px solid ' + C.mist,
+      borderTopColor: C.brand,
+      animation: 'impeccable-spin 0.6s linear infinite',
+      flexShrink: '0',
+    });
+    row.appendChild(spinner);
+    const label = el('span', {
+      fontSize: '12px', color: C.ash, fontWeight: '500',
+    });
+    label.textContent = 'Applying variant...';
+    row.appendChild(label);
+
+    // Inject the keyframes if not already present
+    if (!document.getElementById(PREFIX + '-keyframes')) {
+      const style = document.createElement('style');
+      style.id = PREFIX + '-keyframes';
+      style.textContent = '@keyframes impeccable-spin { to { transform: rotate(360deg); } }';
+      document.head.appendChild(style);
+    }
+    return row;
+  }
+
+  // --- Confirmed row (green success, auto-dismisses) ---
+
+  function buildConfirmedRow() {
+    const row = el('div', {
+      display: 'flex', alignItems: 'center', gap: '8px',
+      padding: '2px 8px',
+    });
+    const check = el('span', {
+      fontSize: '15px', lineHeight: '1', flexShrink: '0',
+      color: 'oklch(45% 0.15 145)',
+    });
+    check.textContent = '\u2713';
+    row.appendChild(check);
+    const label = el('span', {
+      fontSize: '12px', color: 'oklch(35% 0.1 145)', fontWeight: '600',
+    });
+    label.textContent = 'Variant applied';
+    row.appendChild(label);
     return row;
   }
 
@@ -753,6 +816,31 @@
           console.error('[impeccable] Auth failed:', msg.reason);
           break;
         case 'done':
+          if (state === 'SAVING') {
+            // Accept/discard was processed. Show green confirmation, then dismiss.
+            state = 'CONFIRMED';
+            updateBarContent('confirmed');
+            setTimeout(() => {
+              hideBar();
+              hideHighlight();
+              stopScrollTracking();
+              if (variantObserver) { variantObserver.disconnect(); variantObserver = null; }
+              clearSession();
+              selectedElement = null;
+              currentSessionId = null;
+              selectedAction = 'impeccable';
+              state = 'PICKING';
+            }, 1800);
+            return;
+          }
+          // If variants haven't appeared in the DOM yet (no HMR), reload the
+          // page. The resumeSession logic will pick them up after reload.
+          if (arrivedVariants === 0 && expectedVariants > 0) {
+            console.log('[impeccable] Variants written but not in DOM (no HMR). Reloading...');
+            saveSession();
+            location.reload();
+            return;
+          }
           state = 'CYCLING';
           updateBarContent('cycling');
           break;
@@ -807,6 +895,7 @@
       if (pickerEl?.style.display !== 'none') { hideActionPicker(); return; }
       if (state === 'CONFIGURING') { hideBar(); stopScrollTracking(); state = 'PICKING'; return; }
       if (state === 'CYCLING') { handleDiscard(); return; }
+      if (state === 'SAVING' || state === 'CONFIRMED') return; // don't interrupt
       if (state === 'PICKING') { hideHighlight(); state = 'IDLE'; return; }
     }
 
@@ -878,16 +967,19 @@
   function handleAccept() {
     if (!currentSessionId || arrivedVariants === 0) return;
     sendWS({ type: 'accept', id: currentSessionId, variantId: String(visibleVariant) });
-    // Mark the wrapper so resumeSession won't pick it up after reload
     markSessionHandled();
-    cleanup();
+    state = 'SAVING';
+    updateBarContent('saving');
+    // Don't cleanup yet — wait for the "done" WS message to show confirmation
   }
 
   function handleDiscard() {
     if (!currentSessionId) return;
     sendWS({ type: 'discard', id: currentSessionId });
     markSessionHandled();
-    cleanup();
+    state = 'SAVING';
+    updateBarContent('saving');
+    // Wait for "done" WS message to show confirmation and dismiss
   }
 
   // ---------------------------------------------------------------------------
