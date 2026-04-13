@@ -105,7 +105,7 @@ The agent should insert variant HTML at insertLine.`);
     indent + commentSyntax.open + ' impeccable-variants-start ' + id + ' ' + commentSyntax.close,
     indent + '<div data-impeccable-variants="' + id + '" data-impeccable-variant-count="' + count + '" style="display: contents">',
     indent + '  ' + commentSyntax.open + ' Original ' + commentSyntax.close,
-    indent + '  <div data-impeccable-variant="original" style="display: none">',
+    indent + '  <div data-impeccable-variant="original">',
     originalIndented,
     indent + '  </div>',
     indent + '  ' + commentSyntax.open + ' Variants: insert below this line ' + commentSyntax.close,

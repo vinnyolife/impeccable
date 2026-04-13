@@ -136,9 +136,13 @@ The first variant should NOT have `style="display: none"` (it should be visible 
 
 ### Step 3: Signal completion
 
+Include `--file` so the browser can fetch variants directly if the dev server lacks HMR:
+
 ```bash
-npx impeccable poll --reply EVENT_ID done
+npx impeccable poll --reply EVENT_ID done --file RELATIVE_PATH
 ```
+
+The file path should be relative to the project root (e.g., `public/index.html`, `src/App.tsx`).
 
 ## Handle Accept
 

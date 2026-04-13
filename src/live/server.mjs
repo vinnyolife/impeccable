@@ -161,6 +161,26 @@ function createRequestHandler({ detectScript, liveScriptWithToken }) {
       return;
     }
 
+    // Read a project file from disk (for no-HMR fallback: the browser fetches
+    // the raw source to inject variants when the dev server doesn't support HMR).
+    if (pathname === '/source') {
+      const token = url.searchParams.get('token');
+      if (token !== state.token) { res.writeHead(401); res.end('Unauthorized'); return; }
+      const filePath = url.searchParams.get('path');
+      if (!filePath || filePath.includes('..')) { res.writeHead(400); res.end('Bad path'); return; }
+      const absPath = path.resolve(process.cwd(), filePath);
+      // Safety: must be within the project directory
+      if (!absPath.startsWith(process.cwd())) { res.writeHead(403); res.end('Forbidden'); return; }
+      try {
+        const content = fs.readFileSync(absPath, 'utf-8');
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(content);
+      } catch {
+        res.writeHead(404); res.end('File not found');
+      }
+      return;
+    }
+
     // --- Authenticated endpoints ---
 
     const token = url.searchParams.get('token');

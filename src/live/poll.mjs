@@ -45,15 +45,18 @@ Options:
   const info = readServerInfo();
   const base = `http://localhost:${info.port}`;
 
-  // Reply mode: npx impeccable poll --reply <id> <status> [message]
+  // Reply mode: npx impeccable poll --reply <id> <status> [--file path] [message]
   const replyIdx = args.indexOf('--reply');
   if (replyIdx !== -1) {
     const id = args[replyIdx + 1];
     const status = args[replyIdx + 2] || 'done';
-    const message = args[replyIdx + 3] || undefined;
+    const fileIdx = args.indexOf('--file');
+    const filePath = fileIdx !== -1 && fileIdx + 1 < args.length ? args[fileIdx + 1] : undefined;
+    // Message is any remaining positional arg that isn't a flag
+    const message = args.find((a, i) => i > replyIdx + 2 && !a.startsWith('--') && i !== fileIdx + 1) || undefined;
 
     if (!id) {
-      console.error('Usage: npx impeccable poll --reply <id> <status> [message]');
+      console.error('Usage: npx impeccable poll --reply <id> <status> [--file path] [message]');
       process.exit(1);
     }
 
@@ -66,6 +69,7 @@ Options:
           id,
           type: status,
           message,
+          file: filePath,
         }),
       });
 

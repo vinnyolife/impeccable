@@ -701,6 +701,76 @@
     }
   }
 
+  /**
+   * No-HMR fallback: fetch the raw source file from the live server,
+   * parse it, extract the variant wrapper, and inject it into the live DOM.
+   * This works even when the dev server caches HTML (Bun, static servers).
+   */
+  function injectVariantsFromSource(filePath, sessionId) {
+    const url = 'http://localhost:' + PORT + '/source?token=' + TOKEN + '&path=' + encodeURIComponent(filePath);
+    fetch(url)
+      .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
+      .then(html => {
+        // Parse the raw source HTML
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        const srcWrapper = doc.querySelector('[data-impeccable-variants="' + sessionId + '"]');
+        if (!srcWrapper) {
+          console.error('[impeccable] Variant wrapper not found in source file.');
+          return;
+        }
+
+        // Find the original element in the live DOM.
+        // The original is inside the wrapper in the source. We find the
+        // corresponding element in the live DOM by matching the first child's
+        // tag + classes from the original snapshot.
+        const origContent = srcWrapper.querySelector('[data-impeccable-variant="original"] > :first-child');
+        if (!origContent) return;
+
+        const tag = origContent.tagName.toLowerCase();
+        const cls = origContent.className;
+        let liveEl = null;
+        if (origContent.id) {
+          liveEl = document.getElementById(origContent.id);
+        } else if (cls) {
+          // Find by tag + exact class match
+          const candidates = document.querySelectorAll(tag + '.' + cls.split(' ')[0]);
+          for (const c of candidates) {
+            if (c.className === cls && !own(c)) { liveEl = c; break; }
+          }
+        }
+
+        if (!liveEl) {
+          console.error('[impeccable] Could not find original element in live DOM.');
+          return;
+        }
+
+        // Replace the live element with the full wrapper from source
+        const wrapper = srcWrapper.cloneNode(true);
+        liveEl.parentElement.replaceChild(wrapper, liveEl);
+
+        // Update state: count variants, show the first one
+        const variants = wrapper.querySelectorAll('[data-impeccable-variant]:not([data-impeccable-variant="original"])');
+        arrivedVariants = variants.length;
+        expectedVariants = parseInt(wrapper.dataset.impeccableVariantCount || arrivedVariants);
+        visibleVariant = 1;
+        showVariantInDOM(sessionId, 1);
+
+        // Update selectedElement to the visible variant's content
+        const visEl = wrapper.querySelector('[data-impeccable-variant="1"] > :first-child');
+        selectedElement = visEl || wrapper.parentElement;
+
+        state = 'CYCLING';
+        updateBarContent('cycling');
+        saveSession();
+        console.log('[impeccable] Injected ' + arrivedVariants + ' variants from source file.');
+      })
+      .catch(err => {
+        console.error('[impeccable] Failed to fetch source:', err);
+        showToast('Could not load variants. Try refreshing the page.', 5000);
+      });
+  }
+
   function cycleVariant(dir) {
     const next = visibleVariant + dir;
     if (next < 1 || next > arrivedVariants) return;
@@ -833,12 +903,11 @@
             }, 1800);
             return;
           }
-          // If variants haven't appeared in the DOM yet (no HMR), reload the
-          // page. The resumeSession logic will pick them up after reload.
-          if (arrivedVariants === 0 && expectedVariants > 0) {
-            console.log('[impeccable] Variants written but not in DOM (no HMR). Reloading...');
-            saveSession();
-            location.reload();
+          // If variants haven't appeared in the DOM (no HMR), fetch the raw
+          // source file from the live server and inject variants into the DOM.
+          if (arrivedVariants === 0 && expectedVariants > 0 && msg.file) {
+            console.log('[impeccable] No HMR detected. Fetching variants from source file...');
+            injectVariantsFromSource(msg.file, currentSessionId);
             return;
           }
           state = 'CYCLING';
