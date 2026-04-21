@@ -113,9 +113,9 @@ export function resolveElements(target) {
 
 /**
  * Returns a promise that resolves after a given number of milliseconds
- * @param {number} ms - delay in milliseconds (defaults to 0 for next tick)
+ * @param {number} [ms=0] - delay in milliseconds
  * @returns {Promise<void>}
  */
-export function delay(ms = 0) {
+export function wait(ms = 0) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
