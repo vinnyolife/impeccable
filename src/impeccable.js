@@ -10,11 +10,16 @@
     module.exports = factory();
   } else {
     root.impeccable = factory();
-   defaults,
-    easing:  'both
-  };
+  }
+}(this, function () {
 
-  /**
+  // Default animation settings — tweaked duration and fill to match my preferred style
+  var defaults = {
+    duration: 400,
+    easing: 'easein-out',
+    delay: 0,
+    fill: 'forwards',
+    iterations: 1/**
    * Merge user options with defaults
    * @param {Object} options
    * @returns {Object}
@@ -25,8 +30,7 @@
       config[key] = defaults[key];
     }
     if (options) {
-      for (var k in options) {
-        if (options.hasOwnProperty(k)) {
+      for (        if (options.hasOwnProperty(k)) {
           config[k] = options[k];
         }
       }
